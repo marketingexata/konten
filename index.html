@@ -354,6 +354,40 @@
         color: var(--m);
         font-weight: 700;
       }
+      /* ========== TRANSISI ANTAR MENU ========== */
+      nav button { position: relative; transition: color 0.25s; }
+      nav button span { transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+      nav button.on span { transform: translateY(-2px) scale(1.12); }
+      nav button::after {
+        content: "";
+        position: absolute;
+        top: -8px;
+        left: 28%;
+        right: 28%;
+        height: 3px;
+        border-radius: 0 0 4px 4px;
+        background: var(--g);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+      }
+      nav button.on::after { transform: scaleX(1); }
+      #pg.pg-out > * {
+        opacity: 0;
+        transform: translateX(calc(var(--dx, 24px) * -1));
+        transition: opacity 0.17s ease, transform 0.17s ease;
+      }
+      #pg.pg-in > * {
+        animation: pgIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-delay: calc(var(--i, 0) * 45ms);
+      }
+      #pg.pg-in .cd, #pg.pg-in .gc {
+        animation: pgUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      @keyframes pgIn { from { opacity: 0; transform: translateX(var(--dx, 24px)); } to { opacity: 1; transform: none; } }
+      @keyframes pgUp { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: none; } }
+      @media (prefers-reduced-motion: reduce) {
+        #pg.pg-out > *, #pg.pg-in > *, #pg.pg-in .cd, #pg.pg-in .gc, .md, .ov.on { animation: none !important; transition: none !important; }
+      }
       /* ========== 7. POPUP ========== */
 
       .ov {
@@ -368,6 +402,10 @@
       }
       .ov.on {
         display: flex;
+        animation: ovf 0.2s ease;
+      }
+      @keyframes ovf {
+        from { opacity: 0; }
       }
       .md {
         background: #fff;
@@ -375,19 +413,56 @@
         max-width: 560px;
         max-height: 92vh;
         max-height: calc(var(--vh, 1vh) * 92);
-        overscroll-behavior: contain;
-        overflow: auto;
         border-radius: 24px 24px 0 0;
-        padding: 20px;
+        padding: 0;
         position: relative;
-        animation: up 0.25s;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: up 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      /* header popup: SELALU terlihat (tidak ikut ter-scroll) */
+      .mh {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px 10px 20px;
+        background: #fff;
+        border-bottom: 1px solid #eef0f8;
+        z-index: 3;
+      }
+      .mh:has(.tb) { padding-left: 12px; }
+      .mt {
+        flex: 1;
+        min-width: 0;
+        font-weight: 700;
+        font-size: 16px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .mb {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        padding: 16px 20px calc(20px + env(safe-area-inset-bottom));
       }
       .md.full {
-        height: 92vh;
-        height: calc(var(--vh, 1vh) * 92);
-        padding: 56px 0 0;
+        height: 88vh;
+        height: calc(var(--vh, 1vh) * 88);
+      }
+      .md.full .mb {
+        padding: 0;
+        overflow: hidden;
+        position: relative;
       }
       .md.full iframe {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         border: 0;
@@ -402,14 +477,13 @@
       }
       @keyframes up {
         from {
-          transform: translateY(40px);
+          transform: translateY(60px);
           opacity: 0;
         }
       }
       .x {
-        position: absolute;
-        right: 12px;
-        top: 12px;
+        flex: none;
+        margin-left: auto;
         border: 0;
         background: #eef0f8;
         border-radius: 20px;
@@ -486,8 +560,21 @@
         margin-bottom: 10px;
         border: 0;
       }
+      /* gambar tinggi (story) dibatasi supaya tidak mendorong isi popup */
+      .vw img {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        max-height: 60vh;
+        max-height: calc(var(--vh, 1vh) * 60);
+        margin: 0 auto 10px;
+        object-fit: contain;
+        background: #eef0f8;
+      }
       .vw iframe {
         height: 260px;
+        height: calc(var(--vh, 1vh) * 55);
+        max-height: 520px;
       }
       .vw a {
         color: var(--m);
@@ -615,7 +702,7 @@
       }
     
       /* ========== TOMBOL POPUP GENERATOR (perlebar & tab baru) ========== */
-      .tb { position: absolute; left: 12px; top: 10px; display: flex; gap: 8px; z-index: 2; }
+      .tb { display: flex; gap: 8px; }
       .tb .sec { padding: 7px 12px; font-size: 14px; }
       .md.full { transition: max-width 0.25s; }
       @media (min-width: 700px) { .md.full { max-width: 780px; } .md.full.wide { max-width: min(1400px, 97vw); } }
@@ -920,10 +1007,8 @@
         const show = () => {
           const o = modal(`<iframe src="${src}" allow="clipboard-write; clipboard-read; fullscreen" allowfullscreen></iframe>`, 1),
             md = o.querySelector(".md"),
-            tb = document.createElement("div");
-          tb.className = "tb";
+            tb = o.querySelector(".tb");
           tb.innerHTML = `<button class="sec" data-a="w">${I("expand")} Perlebar</button><button class="sec" data-a="n">${I("ext")} Tab baru</button>`;
-          md.append(tb);
           if (localStorage.genw == "1" && matchMedia("(min-width:700px)").matches) {
             md.classList.add("wide");
             tb.querySelector('[data-a="w"]').innerHTML = I("expand") + " Normal";
@@ -943,10 +1028,10 @@
           )
           .catch(show);
       }
-      function modal(h, full) {
+      function modal(h, full, title) {
         const o = document.createElement("div");
         o.className = "ov on";
-        o.innerHTML = `<div class="md${full ? " full" : ""}"><button class="x">${I("x")} Tutup</button>${h}</div>`;
+        o.innerHTML = `<div class="md${full ? " full" : ""}"><div class="mh">${full ? '<div class="tb"></div>' : `<span class="mt">${title || ""}</span>`}<button class="x">${I("x")} Tutup</button></div><div class="mb">${h}</div></div>`;
         o.querySelector(".x").onclick = () => o.remove();
         if (full) o.addEventListener("click", (e) => { if (e.target === o) o.remove(); });
         const onKey = (e) => {
@@ -1053,13 +1138,34 @@
         document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.t == tab));
         P[tab]();
       }
-      document.querySelectorAll("nav button").forEach(
-        (b) =>
-          (b.onclick = () => {
-            tab = b.dataset.t;
-            render();
-          }),
-      );
+      const ORDER = ["gen", "mine", "me"];
+      let swapping = 0;
+      function go(t) {
+        if (t === tab || swapping) return;
+        const pg = $("#pg"),
+          dir = ORDER.indexOf(t) > ORDER.indexOf(tab) ? 1 : -1;
+        tab = t;
+        document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.t == tab));
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) return render();
+        swapping = 1;
+        pg.style.setProperty("--dx", dir * 28 + "px");
+        pg.classList.add("pg-out");
+        setTimeout(() => {
+          pg.classList.remove("pg-out");
+          render();
+          scrollTo(0, 0);
+          [...pg.children].forEach((c, i) => c.style.setProperty("--i", Math.min(i, 8)));
+          pg.querySelectorAll(".cd, .gc").forEach((c, i) => (c.style.animationDelay = Math.min(i, 10) * 40 + "ms"));
+          pg.classList.remove("pg-in");
+          void pg.offsetWidth;
+          pg.classList.add("pg-in");
+          setTimeout(() => {
+            pg.classList.remove("pg-in");
+            swapping = 0;
+          }, 650);
+        }, 170);
+      }
+      document.querySelectorAll("nav button").forEach((b) => (b.onclick = () => go(b.dataset.t)));
       const hasDraft = () => {
         const d = JSON.parse(localStorage.draft || "{}");
         return d.lk || d.nt || d.jd || d.n;
@@ -1303,7 +1409,9 @@
                 )
                 .join("");
         const o = modal(
-          `<h3 style="padding-right:80px">${esc(k.judul)}</h3><small style="color:#889">${esc(k.tanggal)} · ${jenis(k)}</small><div class="vw" style="margin-top:10px">${body}</div>${k.catatan ? `<p>${I("text")} ${esc(k.catatan)}</p>` : ""}${k.nilai || k.komentar ? `<div class="nl"><b>Penilaian admin: ${I("star")} ${esc(k.nilai || "-")}</b><p>${esc(k.komentar)}</p></div>` : ""}<button class="sec dng" style="width:100%;margin-top:10px" id="dl">${I("trash")} Hapus konten</button>`,
+          `<small style="color:#889">${esc(k.tanggal)} · ${jenis(k)}</small><div class="vw" style="margin-top:10px">${body}</div>${k.catatan ? `<p>${I("text")} ${esc(k.catatan)}</p>` : ""}${k.nilai || k.komentar ? `<div class="nl"><b>Penilaian admin: ${I("star")} ${esc(k.nilai || "-")}</b><p>${esc(k.komentar)}</p></div>` : ""}<button class="sec dng" style="width:100%;margin-top:10px" id="dl">${I("trash")} Hapus konten</button>`,
+          0,
+          esc(k.judul),
         );
         const rf = o.querySelector("#rf");
         if (rf)
@@ -1336,7 +1444,7 @@
         D.m = m0 || D.m || "link";
         let files = (await st("readonly", (s) => s.get("files"))) || [];
         const o = modal(
-          `<h3>${I("plus")} Konten</h3><div class="seg"><button data-m="link">${I("link")} Input Link</button><button data-m="up">${I("upload")} Upload Konten</button></div><div id="fl"><input id="lk" placeholder="Tempel link konten referensi"><textarea id="nt" placeholder="Tulis catatan… (khusus link, sertakan catatan bagaimana menerapkan konten dari link tersebut untuk divisimu)"></textarea></div><div id="fu"><input id="jd" placeholder="Judul konten"><label class="chk"><input type="checkbox" id="cr"> Konten carousel (boleh banyak file)</label><label class="drop">${I("folder")} Pilih gambar / video<input type="file" id="fi" multiple accept="image/*,video/*" hidden></label><div id="fn"></div></div><p class="sv">${I("check")} Draf tersimpan otomatis</p><button class="pri" id="go">Kirim</button>`,
+          `<h3>${I("plus")} Konten</h3><div class="seg"><button data-m="link">${I("link")} Input Link</button><button data-m="up">${I("upload")} Upload Konten</button></div><div id="fl"><input id="lk" placeholder="Tempel link konten referensi"><textarea id="nt" placeholder="Tulis catatan…"></textarea></div><div id="fu"><input id="jd" placeholder="Judul konten"><label class="chk"><input type="checkbox" id="cr"> Konten carousel (boleh banyak file)</label><label class="drop">${I("folder")} Pilih gambar / video<input type="file" id="fi" multiple accept="image/*,video/*" hidden></label><div id="fn"></div></div><p class="sv">${I("check")} Draf tersimpan otomatis</p><button class="pri" id="go">Kirim</button>`,
         );
         const g = (s) => o.querySelector(s),
           save = () => {
