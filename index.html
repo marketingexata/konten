@@ -1429,7 +1429,7 @@
         D.m = m0 || D.m || "link";
         let files = (await st("readonly", (s) => s.get("files"))) || [];
         const o = modal(
-          `<h3>${I("plus")} Konten</h3><div class="seg"><button data-m="link">${I("link")} Input Link</button><button data-m="up">${I("upload")} Upload Konten</button></div><div id="fl"><input id="lk" placeholder="Tempel link konten referensi"><textarea id="nt" placeholder="Tulis catatan…"></textarea></div><div id="fu"><input id="jd" placeholder="Judul konten"><label class="chk"><input type="checkbox" id="cr"> Konten carousel (boleh banyak file)</label><label class="drop">${I("folder")} Pilih gambar / video<input type="file" id="fi" multiple accept="image/*,video/*" hidden></label><div id="fn"></div></div><p class="sv">${I("check")} Draf tersimpan otomatis</p><button class="pri" id="go">Kirim</button>`,
+          `<h3>${I("plus")} Konten</h3><div class="seg"><button data-m="link">${I("link")} Input Link</button><button data-m="up">${I("upload")} Upload Konten</button></div><div id="fl"><input id="lk" placeholder="Tempel link konten referensi"><textarea id="nt" placeholder="Tulis catatan (wajib jelaskan bagaimana referensi bisa di terapkan ke divisimu…)"></textarea></div><div id="fu"><input id="jd" placeholder="Judul konten"><label class="chk"><input type="checkbox" id="cr"> Konten carousel (boleh banyak file)</label><label class="drop">${I("folder")} Pilih gambar / video<input type="file" id="fi" multiple accept="image/*,video/*" hidden></label><div id="fn"></div></div><p class="sv">${I("check")} Draf tersimpan otomatis</p><button class="pri" id="go">Kirim</button>`,
         );
         const g = (s) => o.querySelector(s),
           save = () => {
