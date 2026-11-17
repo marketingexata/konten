@@ -651,6 +651,21 @@
           transform: translateY(-12px);
         }
       }
+      /* ========== TETRIS (loading upload > 7 detik) ========== */
+      #busy { overflow: auto; }
+      #tbtn { margin-top: 14px; border: 0; border-radius: 12px; padding: 10px 16px; background: #fff; color: var(--n, #0b1a4a); font-weight: 700; font-size: 14px; cursor: pointer; }
+      #tg { margin-top: 8px; }
+      #busy.g #pcw, #busy.g .dots { display: none; }
+      #tinfo { font-size: 13px; margin-bottom: 6px; }
+      #tbar { height: 6px; background: #ffffff30; border-radius: 6px; overflow: hidden; margin: 0 auto 8px; width: 200px; }
+      #tbf { height: 100%; width: 0; background: linear-gradient(90deg, #d6157f, #ff8a1f); }
+      #tcv { display: block; margin: 0 auto; width: 200px; height: 320px; max-height: 46vh; max-width: 29vh; background: #0b1a4a; border: 2px solid #ffffff40; border-radius: 10px; cursor: pointer; touch-action: manipulation; }
+      #tpad { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
+      #tpad button { width: 46px; height: 40px; border: 0; border-radius: 10px; background: #ffffff25; color: #fff; display: grid; place-items: center; cursor: pointer; }
+      #tpad svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+      @media (hover: hover) and (pointer: fine) { #tpad { display: none; } }
+      #thint { font-size: 11px; opacity: 0.75; margin-top: 6px; }
+      #tx { margin-top: 8px; border: 1.5px solid #ffffff50; background: none; color: #fff; border-radius: 10px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
       #toast {
         position: fixed;
         bottom: 100px;
@@ -890,6 +905,21 @@
           ></span>
         </div>
         <p id="bt" style="margin-top: 8px"></p>
+        <button id="tbtn" hidden>Main Tetris sambil menunggu</button>
+        <div id="tg" hidden>
+          <div id="tinfo">Upload <b id="tpc">0%</b> · Skor <b id="tsc">0</b></div>
+          <div id="tbar"><div id="tbf"></div></div>
+          <canvas id="tcv" width="200" height="320"></canvas>
+          <div id="tpad">
+            <button data-k="l" aria-label="Kiri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg></button>
+            <button data-k="u" aria-label="Putar"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5" /></svg></button>
+            <button data-k="r" aria-label="Kanan"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg></button>
+            <button data-k="d" aria-label="Turun"><svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7" /></svg></button>
+            <button data-k="x" aria-label="Jatuhkan"><svg viewBox="0 0 24 24"><path d="M6 5l6 6 6-6M6 13l6 6 6-6" /></svg></button>
+          </div>
+          <div id="thint">Mouse: gerak = geser · klik kiri = putar · klik kanan = jatuhkan · scroll = turun/putar<br />Keyboard: panah &amp; spasi</div>
+          <button id="tx">Tutup game</button>
+        </div>
       </div>
     </div>
     <div id="toast"></div>
@@ -967,9 +997,13 @@
         $("#pc").textContent = p + "%";
         $("#ring").style.strokeDashoffset = 283 - 2.83 * p;
         if (t) $("#bt").textContent = t;
+        $("#tpc").textContent = p + "%";
+        $("#tbf").style.width = p + "%";
       }
       function busy(on, t, man) {
         clearInterval(bT);
+        clearTimeout(tT);
+        TET.stop();
         if (!on) {
           setP(100);
           setTimeout(() => $("#busy").classList.remove("on"), 350);
@@ -977,6 +1011,7 @@
         }
         $("#busy").classList.add("on");
         setP(0, t || "Memproses…");
+        if (man) tT = setTimeout(() => ($("#tbtn").hidden = false), 7000); // tawarkan tetris kalau upload > 7 detik
         if (!man) {
           let p = 0;
           bT = setInterval(() => {
@@ -1001,6 +1036,136 @@
         t.style.display = "block";
         setTimeout(() => (t.style.display = "none"), 3500);
       }
+      // ========== TETRIS (ditawarkan saat upload lebih dari 7 detik) ==========
+      let tT;
+      const TET = (() => {
+        const C = 20, W = 10, H = 16,
+          COL = ["", "#ff5c7a", "#ffd45c", "#d6157f", "#ff8a1f", "#4f8bff", "#19b394", "#9b5cff"],
+          SH = [[[1, 1, 1, 1]], [[1, 1], [1, 1]], [[0, 1, 0], [1, 1, 1]], [[1, 0, 0], [1, 1, 1]], [[0, 0, 1], [1, 1, 1]], [[0, 1, 1], [1, 1, 0]], [[1, 1, 0], [0, 1, 1]]];
+        let cv, cx, bd, p, sc, tm, on = 0, over = 0;
+        const rot = (m) => m[0].map((_, i) => m.map((r) => r[i]).reverse()),
+          hit = (m, x, y) => m.some((r, j) => r.some((v, i) => v && (x + i < 0 || x + i >= W || y + j >= H || (y + j >= 0 && bd[y + j][x + i])))),
+          sp = () => {
+            const i = (Math.random() * 7) | 0, m = SH[i];
+            p = { m, c: i + 1, x: ((W - m[0].length) / 2) | 0, y: 0 };
+            if (hit(m, p.x, p.y)) {
+              over = 1;
+              clearTimeout(tm);
+            }
+          };
+        function lock() {
+          p.m.forEach((r, j) => r.forEach((v, i) => v && p.y + j >= 0 && (bd[p.y + j][p.x + i] = p.c)));
+          let n = 0;
+          for (let y = H - 1; y >= 0; y--)
+            if (bd[y].every(Boolean)) {
+              bd.splice(y, 1);
+              bd.unshift(Array(W).fill(0));
+              n++;
+              y++;
+            }
+          sc += [0, 100, 300, 500, 800][n];
+          $("#tsc").textContent = sc;
+          sp();
+        }
+        const mv = (d) => !over && !hit(p.m, p.x + d, p.y) && ((p.x += d), 1),
+          turn = () => {
+            if (over) return;
+            const r = rot(p.m);
+            for (const k of [0, -1, 1, -2, 2]) if (!hit(r, p.x + k, p.y)) return (p.m = r), (p.x += k);
+          },
+          down = () => {
+            if (over) return;
+            hit(p.m, p.x, p.y + 1) ? lock() : p.y++;
+          },
+          drop = () => {
+            if (over) return;
+            while (!hit(p.m, p.x, p.y + 1)) p.y++;
+            lock();
+          },
+          A = { l: () => mv(-1), r: () => mv(1), u: turn, d: down, x: drop };
+        function draw() {
+          cx.fillStyle = "#0b1a4a";
+          cx.fillRect(0, 0, W * C, H * C);
+          const cell = (x, y, c) => {
+            cx.fillStyle = COL[c];
+            cx.fillRect(x * C + 1, y * C + 1, C - 2, C - 2);
+          };
+          bd.forEach((r, y) => r.forEach((v, x) => v && cell(x, y, v)));
+          if (!over) p.m.forEach((r, j) => r.forEach((v, i) => v && cell(p.x + i, p.y + j, p.c)));
+          else {
+            cx.fillStyle = "#0b1a4acc";
+            cx.fillRect(0, 0, W * C, H * C);
+            cx.fillStyle = "#fff";
+            cx.textAlign = "center";
+            cx.font = "700 20px system-ui";
+            cx.fillText("Game over", W * C / 2, 140);
+            cx.font = "13px system-ui";
+            cx.fillText("Klik untuk main lagi", W * C / 2, 168);
+          }
+        }
+        function loop() {
+          if (!on) return;
+          down();
+          draw();
+          if (!over) tm = setTimeout(loop, Math.max(110, 600 - sc / 4));
+        }
+        function reset() {
+          bd = Array.from({ length: H }, () => Array(W).fill(0));
+          sc = 0;
+          over = 0;
+          $("#tsc").textContent = 0;
+          sp();
+          clearTimeout(tm);
+          tm = setTimeout(loop, 600);
+          draw();
+        }
+        const act = (k) => {
+          if (!on) return;
+          if (over) return reset();
+          A[k]();
+          draw();
+        };
+        function init() {
+          cv = $("#tcv");
+          cx = cv.getContext("2d");
+          cv.oncontextmenu = (e) => e.preventDefault();
+          cv.onmousemove = (e) => {
+            if (!on || over) return;
+            const t = Math.max(0, Math.min(W - p.m[0].length, Math.floor((e.offsetX / cv.clientWidth) * W - p.m[0].length / 2 + 0.5)));
+            while (p.x != t && mv(t > p.x ? 1 : -1));
+            draw();
+          };
+          cv.onmousedown = (e) => {
+            e.preventDefault();
+            act(e.button == 2 ? "x" : "u");
+          };
+          cv.addEventListener("wheel", (e) => { e.preventDefault(); act(e.deltaY > 0 ? "d" : "u"); }, { passive: false });
+          document.addEventListener("keydown", (e) => {
+            const k = { ArrowLeft: "l", ArrowRight: "r", ArrowUp: "u", ArrowDown: "d", " ": "x" }[e.key];
+            if (on && k) { e.preventDefault(); act(k); }
+          });
+          document.querySelectorAll("#tpad button").forEach((b) => (b.onpointerdown = (e) => { e.preventDefault(); act(b.dataset.k); }));
+          $("#tbtn").onclick = () => {
+            $("#tbtn").hidden = true;
+            $("#tg").hidden = false;
+            $("#busy").classList.add("g");
+            on = 1;
+            reset();
+          };
+          $("#tx").onclick = () => {
+            stop();
+            $("#tbtn").hidden = false;
+          };
+        }
+        function stop() {
+          on = 0;
+          clearTimeout(tm);
+          $("#tg").hidden = true;
+          $("#busy").classList.remove("g");
+        }
+        return { init, stop };
+      })();
+      TET.init();
       // ========== 6. POPUP ==========
 
       function openGen(src) {
