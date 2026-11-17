@@ -368,6 +368,35 @@
         margin-bottom: 14px;
         text-align: center;
       }
+      /* ========== TAMBAHAN: TAB, PENILAIAN, REKAP, PENGATURAN ========== */
+      .nav { display: flex; gap: 6px; margin: 12px 0; background: #fff; border-radius: 14px; padding: 4px; }
+      .nav button { flex: 1; border: 0; background: none; padding: 9px; border-radius: 11px; font-weight: 600; color: #556; cursor: pointer; font-size: 14px; }
+      .nav button.on { background: var(--g); color: #fff; }
+      .sl { display: block; font-size: 13px; font-weight: 600; margin-top: 8px; }
+      .sl small { font-weight: 400; color: #889; margin-left: 6px; }
+      .tt { margin: 10px 0; font-size: 14px; }
+      .tt b { color: var(--m); font-size: 22px; }
+      .ot { background: #f6f7fc; border-radius: 12px; padding: 10px; margin: 8px 0; font-size: 13px; }
+      .ot b { margin-right: 8px; }
+      .ot span { float: right; font-weight: 700; color: var(--m); }
+      .ot small { display: block; color: #667; margin-top: 4px; }
+      .ot p { margin-top: 6px; white-space: pre-line; }
+      .tw { overflow-x: auto; background: #fff; border-radius: 14px; }
+      table.rk { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 600px; }
+      .rk th { background: var(--n); color: #fff; padding: 9px 8px; text-align: center; font-size: 12px; }
+      .rk td { padding: 8px; text-align: center; border-bottom: 1px solid #eef0f8; }
+      .rk td.nm { text-align: left; font-weight: 600; }
+      .rk td.hi span { background: linear-gradient(90deg, #ffd45c, #ffb21f); color: #4a3000; font-weight: 800; padding: 3px 10px; border-radius: 20px; display: inline-block; }
+      .ht { font-size: 12px; color: #889; margin: 8px 0; }
+      .pn { background: #fff; border-radius: 16px; padding: 14px; margin: 12px 0; }
+      .tg4 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+      .tg4 label { font-size: 13px; font-weight: 600; }
+      .if { border: 1.5px solid #e3e6f3; border-radius: 12px; padding: 10px; margin: 8px 0; font-size: 13px; }
+      .if.w { background: #ffe9ee; border-color: #f6b8c6; }
+      .if.off { opacity: 0.55; }
+      .if p { margin: 6px 0; white-space: pre-line; }
+      .if .ac { display: flex; gap: 6px; }
+      .if .ac button { border: 1.5px solid #dde1f0; background: #fff; border-radius: 10px; padding: 5px 10px; font-size: 12px; cursor: pointer; }
     </style>
   </head>
   <body>
@@ -462,9 +491,13 @@
         </div>
         <div class="stat">
           <div><b id="s1">0</b>Total konten</div>
-          <div><b id="s2">0</b>Belum dinilai</div>
+          <div><b id="s2">0</b>Belum kamu nilai</div>
           <div><b id="s3">0</b>User aktif</div>
         </div>
+        <div class="nav">
+          <button data-t="konten">Konten</button><button data-t="rekap">Rekap</button><button data-t="atur">Pengaturan</button>
+        </div>
+        <div id="tk">
         <div class="bar">
           <input class="q" id="fq" placeholder="Cari judul, user, catatan, link…" /><select id="fu"></select
           ><select id="fj">
@@ -476,6 +509,13 @@
           ><input type="date" id="fd" />
         </div>
         <div id="gl"></div>
+        </div>
+        <div id="tr" hidden>
+          <div class="bar"><input type="date" id="rd1" /><input type="date" id="rd2" /></div>
+          <p class="ht">Periode berdasarkan tanggal upload konten (kosongkan = semua). Hanya konten yang sudah dinilai minimal 1 admin. Tiap kolom = jumlah nilai rata-rata semua konten user. Warna kuning = nilai tertinggi.</p>
+          <div id="rkt"></div>
+        </div>
+        <div id="ta" hidden></div>
       </div>
     </div>
 
@@ -654,9 +694,23 @@
       $("#rf").onclick = () => task("Memuat data…", load);
       // ========== 8. MUAT DATA & RENDER ==========
 
+      let NA = 3, CFG = {}, INFO = [], USERS = [], TAB = "konten";
+      const FMT = { gambar: 5, carousel: 7, video: 10, link: 10 },
+        FL = { gambar: "Gambar single", carousel: "Carousel", video: "Video", link: "Link" },
+        MX = { ide: 35, desain: 30, lengkap: 25 };
+      const N = (v) => Number(v) || 0,
+        tot = (s) => N(s.ide) + N(s.desain) + N(s.lengkap) + N(s.fpoin),
+        avg = (a, f) => (a.length ? a.reduce((x, s) => x + (typeof f == "function" ? f(s) : N(s[f])), 0) / a.length : 0),
+        r1 = (x) => Math.round(x * 10) / 10,
+        mine = (k) => k.sk.find((s) => String(s.admin).trim() == String(A.n).trim()),
+        fin = (k) => (k.sk.length ? Math.round(avg(k.sk, tot)) : k.nilai);
       async function load() {
         const r = await api("aList");
-        K = r.k.map((k) => ({ ...k, files: k.files ? JSON.parse(k.files) : [] })).reverse();
+        K = r.k.map((k) => ({ ...k, files: k.files ? JSON.parse(k.files) : [], sk: k.sk || [] })).reverse();
+        NA = r.na || 3;
+        CFG = r.cfg || {};
+        INFO = r.info || [];
+        USERS = r.us || [];
         render();
       }
       function render() {
@@ -670,11 +724,25 @@
           '<option value="">Semua user</option>' +
           us.map((u) => `<option ${u == v ? "selected" : ""}>${esc(u)}</option>`).join("");
         $("#s1").textContent = K.length;
-        $("#s2").textContent = K.filter((k) => !k.nilai).length;
+        $("#s2").textContent = K.filter((k) => !mine(k)).length;
         $("#s3").textContent = us.length;
+        document.querySelectorAll(".nav button").forEach((b) => b.classList.toggle("on", b.dataset.t == TAB));
+        $("#tk").hidden = TAB != "konten";
+        $("#tr").hidden = TAB != "rekap";
+        $("#ta").hidden = TAB != "atur";
         list();
+        if (TAB == "rekap") rekap();
+        if (TAB == "atur") atur();
       }
       ["fq", "fu", "fj", "fd"].forEach((i) => ($("#" + i).oninput = list));
+      ["rd1", "rd2"].forEach((i) => ($("#" + i).oninput = rekap));
+      document.querySelectorAll(".nav button").forEach(
+        (b) =>
+          (b.onclick = () => {
+            TAB = b.dataset.t;
+            render();
+          }),
+      );
       // ========== 9. DAFTAR & PENCARIAN ==========
 
       function list() {
@@ -694,13 +762,15 @@
                 .includes(q)),
         );
         $("#gl").innerHTML = r.length
-          ? `<div class="grid">${r.map((k) => `<div class="cd" onclick="view('${k.id}')"><div class="th ${k.tipe == "link" ? "lk" : ""}">${k.tipe == "link" ? I("link") + lt(k) : `<img loading="lazy" src="${th(k.files[0] && k.files[0].id)}400" onerror="this.remove()">${I("image")}`}<span class="tg">${jenis(k)}</span><span class="sc ${k.nilai ? "" : "nw"}">${k.nilai ? I("star") + " " + esc(k.nilai) : "Baru"}</span></div><p>${esc(k.judul)}</p><small>${I("user")} ${esc(k.nama)} · ${esc(k.tanggal)}</small></div>`).join("")}</div>`
+          ? `<div class="grid">${r.map((k) => `<div class="cd" onclick="view('${k.id}')"><div class="th ${k.tipe == "link" ? "lk" : ""}">${k.tipe == "link" ? I("link") + lt(k) : `<img loading="lazy" src="${th(k.files[0] && k.files[0].id)}400" onerror="this.remove()">${I("image")}`}<span class="tg">${jenis(k)}</span><span class="sc ${fin(k) ? "" : "nw"}">${fin(k) ? I("star") + " " + esc(fin(k)) + (k.sk.length ? ` · ${k.sk.length}/${NA}` : "") : "Baru"}</span></div><p>${esc(k.judul)}</p><small>${I("user")} ${esc(k.nama)} · ${esc(k.tanggal)}</small></div>`).join("")}</div>`
           : '<p style="text-align:center;color:#889;margin-top:40px">Tidak ada konten</p>';
       }
       // ========== 10. VIEWER & PENILAIAN ==========
 
       function view(id) {
-        const k = K.find((x) => x.id == id);
+        const k = K.find((x) => x.id == id),
+          m = mine(k) || {},
+          oth = k.sk.filter((s) => String(s.admin).trim() != String(A.n).trim());
         const body =
           k.tipe == "link"
             ? `${lt(k)}<a href="${esc(k.url)}" target="_blank" rel="noopener">${esc(k.url)}</a>`
@@ -711,20 +781,99 @@
                     : `<a href="https://drive.google.com/file/d/${f.id}/view" target="_blank"><img src="${th(f.id)}1200"></a>`,
                 )
                 .join("");
+        const inp = (key, lbl) =>
+          `<label class="sl">${lbl}<small>maks ${MX[key]}</small><input id="s_${key}" type="number" inputmode="decimal" min="0" max="${MX[key]}" step="any" value="${esc(m[key] ?? "")}"></label>`;
+        const fm0 = m.format || jenis(k);
         const o = modal(
-          `<h3 style="padding-right:80px">${esc(k.judul)}</h3><small style="color:#889">${I("user")} ${esc(k.nama)} · ${esc(k.tanggal)} · ${jenis(k)}</small><div class="vw" style="margin:10px 0">${body}</div>${k.catatan ? `<p style="margin-bottom:12px">${I("text")} ${esc(k.catatan)}</p>` : ""}<h3>Penilaian</h3><input id="nl" type="number" min="0" max="100" placeholder="Nilai 0-100" value="${esc(k.nilai)}"><textarea id="km" placeholder="Komentar untuk user…">${esc(k.komentar)}</textarea><button class="pri" id="sv">Simpan penilaian</button>`,
+          `<h3 style="padding-right:80px">${esc(k.judul)}</h3><small style="color:#889">${I("user")} ${esc(k.nama)} · ${esc(k.tanggal)} · ${jenis(k)}</small><div class="vw" style="margin:10px 0">${body}</div>${k.catatan ? `<p style="margin-bottom:12px">${I("text")} ${esc(k.catatan)}</p>` : ""}` +
+            (k.sk.length ? `<p class="tt">Rata-rata saat ini: <b>${fin(k)}</b> <small>(${k.sk.length}/${NA} admin sudah menilai)</small></p>` : "") +
+            `<h3>Penilaianmu</h3>${inp("ide", "Ide")}${inp("desain", "Desain")}${inp("lengkap", "Kelengkapan &amp; keselarasan")}<label class="sl">Format konten<select id="s_fmt">${Object.keys(FMT).map((f) => `<option value="${f}" ${f == fm0 ? "selected" : ""}>${FL[f]} (${FMT[f]} poin)</option>`).join("")}</select></label><p class="tt">Totalmu: <b id="s_tot">0</b> <small id="s_max"></small></p><textarea id="km" placeholder="Komentar untuk user…">${esc(m.kom)}</textarea><button class="pri" id="sv">Simpan penilaian</button>` +
+            (oth.length
+              ? `<h3 style="margin-top:16px">Penilaian admin lain</h3>${oth.map((s) => `<div class="ot"><b>${esc(s.admin)}</b><span>${tot(s)}</span><small>Ide ${esc(s.ide)} · Desain ${esc(s.desain)} · Kelengkapan ${esc(s.lengkap)} · ${esc(FL[s.format] || s.format)} ${esc(s.fpoin)}</small>${s.kom ? `<p>${esc(s.kom)}</p>` : ""}</div>`).join("")}`
+              : ""),
         );
-        o.querySelector("#sv").onclick = () => {
-          const nilai = o.querySelector("#nl").value,
-            kom = o.querySelector("#km").value;
+        const g = (s) => o.querySelector(s),
+          upd = () => {
+            const f = g("#s_fmt").value;
+            g("#s_tot").textContent = r1(N(g("#s_ide").value) + N(g("#s_desain").value) + N(g("#s_lengkap").value) + FMT[f]);
+            g("#s_max").textContent = `dari maks ${90 + FMT[f]}`;
+          };
+        ["#s_ide", "#s_desain", "#s_lengkap", "#s_fmt"].forEach((s) => (g(s).oninput = upd));
+        upd();
+        g("#sv").onclick = () => {
+          const d = { id, fmt: g("#s_fmt").value, kom: g("#km").value };
+          for (const [key, lbl] of [["ide", "Ide"], ["desain", "Desain"], ["lengkap", "Kelengkapan & keselarasan"]]) {
+            const v = g("#s_" + key).value;
+            if (v === "" || +v < 0 || +v > MX[key]) return toast(`${lbl} harus diisi 0-${MX[key]}`);
+            d[key] = v;
+          }
           task("Menyimpan penilaian…", async () => {
-            await api("aNilai", { id, nilai, kom });
-            Object.assign(k, { nilai, komentar: kom, penilai: A.n });
+            await api("aNilai", d);
+            await load();
             o.remove();
-            render();
             toast("Penilaian tersimpan");
           });
         };
+      }
+      // ========== 11. REKAP ==========
+
+      function rekap() {
+        const a = $("#rd1").value,
+          b = $("#rd2").value,
+          inR = (k) => {
+            const d = String(k.tanggal).slice(0, 10);
+            return (!a || d >= a) && (!b || d <= b);
+          };
+        const R = [...new Set([...USERS, ...K.map((k) => k.nama)])]
+          .filter(Boolean)
+          .map((n) => {
+            const ks = K.filter((k) => k.nama == n && k.sk.length && inR(k)),
+              s = (f) => r1(ks.reduce((x, k) => x + avg(k.sk, f), 0)),
+              o = { n, c: ks.length, ide: s("ide"), des: s("desain"), lk: s("lengkap"), fm: s("fpoin") };
+            o.t = r1(o.ide + o.des + o.lk + o.fm);
+            return o;
+          })
+          .sort((x, y) => y.t - x.t || x.n.localeCompare(y.n));
+        const M = Object.fromEntries(["ide", "des", "lk", "t"].map((f) => [f, Math.max(0, ...R.map((r) => r[f]))])),
+          c = (r, f) => `<td class="${M[f] > 0 && r[f] == M[f] ? "hi" : ""}"><span>${r[f]}</span></td>`;
+        $("#rkt").innerHTML = R.length
+          ? `<div class="tw"><table class="rk"><thead><tr><th>#</th><th>Nama</th><th>Konten</th><th>Ide</th><th>Desain</th><th>Kelengkapan &amp; Keselarasan</th><th>Format</th><th>Total</th></tr></thead><tbody>${R.map((r, i) => `<tr><td>${i + 1}</td><td class="nm">${esc(r.n)}</td><td>${r.c}</td>${c(r, "ide")}${c(r, "des")}${c(r, "lk")}<td>${r.fm}</td>${c(r, "t")}</tr>`).join("")}</tbody></table></div>`
+          : '<p style="text-align:center;color:#889;margin-top:30px">Belum ada data</p>';
+      }
+      // ========== 12. PENGATURAN: TARGET MINGGUAN & PENGUMUMAN ==========
+
+      function atur() {
+        $("#ta").innerHTML =
+          `<div class="pn"><h3>Target mingguan user</h3><p class="ht">Jumlah konten yang harus diupload user tiap minggu (Senin–Minggu). Isi 0 kalau tidak diwajibkan. Contoh: video 1 dan link 2.</p><div class="tg4">${["gambar", "carousel", "video", "link"].map((t) => `<label>${FL[t]}<input type="number" min="0" max="20" id="tg_${t}" value="${N(CFG[t])}"></label>`).join("")}</div><button class="pri" id="tgs">Simpan target</button></div>` +
+          `<div class="pn"><h3>Pengumuman &amp; peringatan</h3><p class="ht">Muncul di dashboard user sampai dinonaktifkan atau dihapus.</p><select id="il_lv"><option value="info">Pengumuman</option><option value="warn">Peringatan</option></select><select id="il_un"><option value="Semua">Semua user</option>${[...USERS].sort().map((u) => `<option>${esc(u)}</option>`).join("")}</select><textarea id="il_tx" placeholder="Isi pesan (teks bebas)…"></textarea><button class="pri" id="ils">Kirim ke user</button><div id="il">${[...INFO].reverse().map((x) => `<div class="if ${x.level == "warn" ? "w" : ""} ${String(x.aktif) == "1" ? "" : "off"}"><small>${x.level == "warn" ? "Peringatan" : "Pengumuman"} · untuk ${esc(x.untuk || "Semua")} · ${esc(x.tanggal)} · ${esc(x.oleh)}${String(x.aktif) == "1" ? "" : " · nonaktif"}</small><p>${esc(x.teks)}</p><div class="ac"><button onclick="infoAct('aInfoTog','${x.id}')">${String(x.aktif) == "1" ? "Nonaktifkan" : "Aktifkan"}</button><button onclick="if(confirm('Hapus pengumuman ini?'))infoAct('aInfoDel','${x.id}')">Hapus</button></div></div>`).join("") || '<p class="ht">Belum ada pengumuman.</p>'}</div></div>`;
+        $("#tgs").onclick = () => {
+          const c = {};
+          for (const t of ["gambar", "carousel", "video", "link"]) {
+            const v = $("#tg_" + t).value;
+            if (v === "" || +v < 0 || +v > 20 || +v % 1) return toast(`Target ${FL[t]} harus bilangan bulat 0-20`);
+            c[t] = +v;
+          }
+          task("Menyimpan target…", async () => {
+            await api("aCfg", { cfg: JSON.stringify(c) });
+            await load();
+            toast("Target tersimpan");
+          });
+        };
+        $("#ils").onclick = () => {
+          const teks = $("#il_tx").value.trim();
+          if (!teks) return toast("Isi pesan dulu");
+          task("Mengirim…", async () => {
+            await api("aInfoAdd", { teks, level: $("#il_lv").value, untuk: $("#il_un").value });
+            await load();
+            toast("Terkirim ke user");
+          });
+        };
+      }
+      function infoAct(a, id) {
+        task("Memproses…", async () => {
+          await api(a, { id });
+          await load();
+        });
       }
       if (A)
         load().catch(() => {
