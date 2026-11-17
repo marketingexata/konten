@@ -1125,6 +1125,8 @@
       async function load() {
         const r = await api("list");
         K = r.k.map((k) => ({ ...k, files: k.files ? JSON.parse(k.files) : [] })).reverse();
+        CFG = Object.assign({ gambar: 1, carousel: 0, video: 1, link: 1 }, r.cfg || {});
+        INFO = r.info || [];
         loaded = 1;
         render();
         backfill();
@@ -1174,8 +1176,10 @@
         hasDraft()
           ? `<div class="draft">${I("edit")} Ada draf belum terkirim<button onclick="openAdd()">Lanjutkan</button></div>`
           : "";
-      // ========== REMINDER MINGGUAN (target: 2 gambar/video + 1 link, minggu Senin-Minggu WIB) ==========
-      const WK = { media: 2, link: 1 };
+      // ========== REMINDER MINGGUAN (target per jenis diatur admin, minggu Senin-Minggu WIB) ==========
+      const TY = ["gambar", "carousel", "video", "link"];
+      let CFG = { gambar: 1, carousel: 0, video: 1, link: 1 },
+        INFO = [];
       const jkt = () => {
         const p = Object.fromEntries(
           new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Jakarta", year: "numeric", month: "2-digit", day: "2-digit" })
@@ -1196,14 +1200,17 @@
         const f = (x) => x.toISOString().slice(0, 10);
         return { s: f(s), e: f(e), today, left: 6 - dow };
       }
-      function weekStat() {
-        const w = weekRange(),
-          my = K.filter((k) => {
-            const d = String(k.tanggal).slice(0, 10);
-            return d >= w.s && d <= w.e;
-          });
-        return { w, media: my.filter((k) => k.tipe !== "link").length, link: my.filter((k) => k.tipe === "link").length };
-      }
+      const cap = (s) => s[0].toUpperCase() + s.slice(1);
+      const cntBy = (a, b) => {
+        const c = { gambar: 0, carousel: 0, video: 0, link: 0 };
+        K.forEach((k) => {
+          const d = String(k.tanggal).slice(0, 10);
+          if (d >= a && d <= b) c[jenis(k)]++;
+        });
+        return c;
+      };
+      const need = (c) => Object.fromEntries(TY.map((t) => [t, Math.max(0, (+CFG[t] || 0) - c[t])]));
+      const txt = (n, sep = " dan ") => TY.filter((t) => n[t]).map((t) => `${n[t]} ${t}`).join(sep);
       const dmy = (iso) =>
         new Date(iso + "T00:00:00Z").toLocaleDateString("id-ID", { day: "numeric", month: "short", timeZone: "UTC" });
       const pbar = (lbl, v, max) => {
@@ -1212,17 +1219,20 @@
       };
       function remindBar() {
         if (!loaded || !U) return "";
-        const { w, media, link } = weekStat(),
-          nm = Math.max(0, WK.media - media),
-          nl = Math.max(0, WK.link - link),
-          tot = Math.min(media, WK.media) + Math.min(link, WK.link),
-          bars = pbar("Total target", tot, WK.media + WK.link) + pbar("Gambar / video", media, WK.media) + pbar("Link", link, WK.link),
+        const w = weekRange(),
+          c = cntBy(w.s, w.e),
+          n = need(c),
+          ts = TY.filter((t) => +CFG[t] > 0);
+        if (!ts.length) return "";
+        const totT = ts.reduce((a, t) => a + +CFG[t], 0),
+          totD = ts.reduce((a, t) => a + Math.min(c[t], +CFG[t]), 0),
+          bars = pbar("Total target", totD, totT) + ts.map((t) => pbar(cap(t), c[t], +CFG[t])).join(""),
           rng = `Minggu ${dmy(w.s)} – ${dmy(w.e)}`;
-        if (!nm && !nl)
+        if (!txt(n))
           return `<div class="rm ok">${I("check")}<div><b>Target mingguan tercapai</b>${rng}. Reset otomatis Senin depan.${bars}</div></div>`;
-        const kurang = [nm ? `${nm} konten gambar/video` : "", nl ? `${nl} link` : ""].filter(Boolean).join(" dan "),
-          sisa = w.left ? `Sisa ${w.left} hari.` : "Hari ini hari terakhir!";
-        return `<div class="rm${w.left <= 1 ? " hot" : ""}">${I("bell")}<div><b>Target mingguan belum tercapai</b>${rng}. Masih kurang ${kurang}. ${sisa} Progres direset tiap Senin.${bars}<div class="ac">${nm ? `<button onclick="openAdd('up')">Upload konten</button>` : ""}${nl ? `<button onclick="openAdd('link')">Tambah link</button>` : ""}</div></div></div>`;
+        const sisa = w.left ? `Sisa ${w.left} hari.` : "Hari ini hari terakhir!",
+          nm = n.gambar || n.carousel || n.video;
+        return `<div class="rm${w.left <= 1 ? " hot" : ""}">${I("bell")}<div><b>Target mingguan belum tercapai</b>${rng}. Masih kurang ${txt(n)}. ${sisa} Progres direset tiap Senin.${bars}<div class="ac">${nm ? `<button onclick="openAdd('up')">Upload konten</button>` : ""}${n.link ? `<button onclick="openAdd('link')">Tambah link</button>` : ""}</div></div></div>`;
       }
       // ========== HUTANG KONTEN (kekurangan target minggu-minggu sebelumnya) ==========
       // Aturan: minggu pertama user (sejak konten/kunjungan pertama) bebas; hitung maksimal DEBT_WEEKS minggu terakhir;
@@ -1243,47 +1253,55 @@
         let s = addD(monOf(start), 7);
         const lim = addD(w.s, -7 * DEBT_WEEKS);
         if (s < lim) s = lim;
-        const cnt = (a, b) => {
-          const my = K.filter((k) => {
-            const d = String(k.tanggal).slice(0, 10);
-            return d >= a && d <= b;
-          });
-          return { m: my.filter((k) => k.tipe !== "link").length, l: my.filter((k) => k.tipe === "link").length };
-        };
+        if (CFG.mulai && s < CFG.mulai) s = CFG.mulai; // target baru tidak berlaku mundur
         const wk = [];
-        for (; s < w.s; s = addD(s, 7)) {
-          const c = cnt(s, addD(s, 6)), m = Math.max(0, WK.media - c.m), l = Math.max(0, WK.link - c.l);
-          wk.push({ s, e: addD(s, 6), m, l });
-        }
-        const cur = cnt(w.s, w.e);
-        let pm = Math.max(0, cur.m - WK.media), pl = Math.max(0, cur.l - WK.link);
-        wk.forEach((x) => {
-          const a = Math.min(pm, x.m), b = Math.min(pl, x.l);
-          x.m -= a; x.l -= b; pm -= a; pl -= b;
-        });
-        const rest = wk.filter((x) => x.m || x.l);
-        return { rest, m: rest.reduce((a, x) => a + x.m, 0), l: rest.reduce((a, x) => a + x.l, 0) };
+        for (; s < w.s; s = addD(s, 7)) wk.push({ s, e: addD(s, 6), n: need(cntBy(s, addD(s, 6))) });
+        const cur = cntBy(w.s, w.e),
+          pay = Object.fromEntries(TY.map((t) => [t, Math.max(0, cur[t] - (+CFG[t] || 0))]));
+        wk.forEach((x) =>
+          TY.forEach((t) => {
+            const a = Math.min(pay[t], x.n[t]);
+            x.n[t] -= a;
+            pay[t] -= a;
+          }),
+        );
+        const rest = wk.filter((x) => txt(x.n));
+        return { rest, tot: Object.fromEntries(TY.map((t) => [t, rest.reduce((a, x) => a + x.n[t], 0)])) };
       }
       function debtBar() {
         if (!loaded || !U) return "";
-        const d = debtInfo();
-        if (!d.m && !d.l) return "";
-        const tot = [d.m ? `${d.m} konten gambar/video` : "", d.l ? `${d.l} link` : ""].filter(Boolean).join(" dan "),
-          rows = d.rest
-            .map((x) => `<li>${dmy(x.s)} – ${dmy(x.e)}: kurang ${[x.m ? x.m + " konten" : "", x.l ? x.l + " link" : ""].filter(Boolean).join(" + ")}</li>`)
-            .join("");
+        const d = debtInfo(),
+          tot = txt(d.tot);
+        if (!tot) return "";
+        const rows = d.rest.map((x) => `<li>${dmy(x.s)} – ${dmy(x.e)}: kurang ${txt(x.n, " + ")}</li>`).join("");
         return `<div class="rm debt">${I("bell")}<div><b>Hutang konten: ${tot}</b>Dari ${d.rest.length} minggu sebelumnya yang targetnya belum terpenuhi. Upload melebihi target minggu ini untuk melunasinya.<details><summary>Rincian per minggu</summary><ul>${rows}</ul></details></div></div>`;
+      }
+      // ========== PENGUMUMAN & PERINGATAN DARI ADMIN ==========
+      const dis = () => JSON.parse(localStorage["inf:" + (U && U.nama)] || "[]");
+      function infoBar() {
+        if (!loaded || !U) return "";
+        const d = dis();
+        return INFO.filter((x) => !d.includes(x.id))
+          .map(
+            (x) =>
+              `<div class="rm${x.level == "warn" ? " hot" : ""}">${I("bell")}<div><b>${x.level == "warn" ? "Peringatan" : "Pengumuman"}</b><span style="white-space:pre-line">${esc(x.teks)}</span><div class="ac"><button class="gh" onclick="dismissInfo('${x.id}')">Mengerti</button></div></div></div>`,
+          )
+          .join("");
+      }
+      function dismissInfo(id) {
+        localStorage["inf:" + U.nama] = JSON.stringify([...dis(), id]);
+        render();
       }
       // ========== 10. ISI HALAMAN (BUAT KONTEN, KONTENKU, PROFIL) ==========
 
       const P = {
         gen() {
           $("#pg").innerHTML =
-            `${remindBar()}${debtBar()}<h2>Buat Konten</h2><div class="stat"><div><b>${K.length}</b>Total konten</div><div><b>${K.filter((k) => k.nilai).length}</b>Sudah dinilai</div></div>${draftBar()}<div class="gens" style="margin-top:12px">${GEN.map((g, i) => `<button class="gc" onclick="openGen('${g[3]}')"><i>${I(g[0])}</i><span><b>${g[1]}</b><small>${g[2]}</small></span></button>`).join("")}</div>`;
+            `${infoBar()}${remindBar()}${debtBar()}<h2>Buat Konten</h2><div class="stat"><div><b>${K.length}</b>Total konten</div><div><b>${K.filter((k) => k.nilai).length}</b>Sudah dinilai</div></div>${draftBar()}<div class="gens" style="margin-top:12px">${GEN.map((g, i) => `<button class="gc" onclick="openGen('${g[3]}')"><i>${I(g[0])}</i><span><b>${g[1]}</b><small>${g[2]}</small></span></button>`).join("")}</div>`;
         },
         mine() {
           $("#pg").innerHTML =
-            `<h2>Kontenku</h2><div class="bar"><input class="q" id="fq" placeholder="Cari judul, catatan, link…" value="${esc(F.q)}"><select id="fj"><option value="">Semua jenis</option>${["link", "gambar", "video", "carousel"].map((j) => `<option ${F.j == j ? "selected" : ""}>${j}</option>`).join("")}</select><input type="date" id="fd" value="${F.d}"></div>${draftBar()}<div id="gl"></div><button class="fab" onclick="openAdd()">${I("plus")} Konten</button>`;
+            `${infoBar()}<h2>Kontenku</h2><div class="bar"><input class="q" id="fq" placeholder="Cari judul, catatan, link…" value="${esc(F.q)}"><select id="fj"><option value="">Semua jenis</option>${["link", "gambar", "video", "carousel"].map((j) => `<option ${F.j == j ? "selected" : ""}>${j}</option>`).join("")}</select><input type="date" id="fd" value="${F.d}"></div>${draftBar()}<div id="gl"></div><button class="fab" onclick="openAdd()">${I("plus")} Konten</button>`;
           $("#fq").oninput = (e) => {
             F.q = e.target.value;
             list();
@@ -1409,7 +1427,7 @@
                 )
                 .join("");
         const o = modal(
-          `<small style="color:#889">${esc(k.tanggal)} · ${jenis(k)}</small><div class="vw" style="margin-top:10px">${body}</div>${k.catatan ? `<p>${I("text")} ${esc(k.catatan)}</p>` : ""}${k.nilai || k.komentar ? `<div class="nl"><b>Penilaian admin: ${I("star")} ${esc(k.nilai || "-")}</b><p>${esc(k.komentar)}</p></div>` : ""}<button class="sec dng" style="width:100%;margin-top:10px" id="dl">${I("trash")} Hapus konten</button>`,
+          `<small style="color:#889">${esc(k.tanggal)} · ${jenis(k)}</small><div class="vw" style="margin-top:10px">${body}</div>${k.catatan ? `<p>${I("text")} ${esc(k.catatan)}</p>` : ""}${k.nilai || k.komentar ? `<div class="nl"><b>Penilaian admin: ${I("star")} ${esc(k.nilai || "-")}</b><p style="white-space:pre-line">${esc(k.komentar)}</p></div>` : ""}<button class="sec dng" style="width:100%;margin-top:10px" id="dl">${I("trash")} Hapus konten</button>`,
           0,
           esc(k.judul),
         );
