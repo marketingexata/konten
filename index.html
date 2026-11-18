@@ -651,6 +651,65 @@
           transform: translateY(-12px);
         }
       }
+      /* ========== TIMELINE, RANKING, NAV 6 MENU ========== */
+      nav { gap: 2px; padding-left: 4px; padding-right: 4px; }
+      nav button { max-width: none; font-size: 10.5px; padding: 6px 2px; }
+      nav button span { font-size: 20px; }
+      .chips { display: flex; gap: 6px; margin: 8px 0 12px; overflow-x: auto; }
+      .chips button { border: 1.5px solid #dde1f0; background: #fff; border-radius: 20px; padding: 6px 12px; font-size: 13px; white-space: nowrap; color: #556; }
+      .chips button.on { background: linear-gradient(135deg, #d6157f, #ff8a1f); border-color: transparent; color: #fff; font-weight: 700; }
+      .vp { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #0002; font-size: 13px; }
+      .vs { color: #e0456b; font-weight: 600; }
+      .vs.ok { color: #19a37a; }
+      .wt { background: #fff6d6; border: 1.5px solid #f2b705; border-radius: 12px; padding: 10px; font-size: 13px; margin-top: 12px; }
+      .wb { height: 8px; background: #e6e9f5; border-radius: 8px; overflow: hidden; margin: 8px 0 4px; }
+      .wb i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #d6157f, #ff8a1f); transition: width 15s linear; }
+      .vb { display: flex; justify-content: center; align-items: center; gap: 28px; margin: 14px 0 0; }
+      .tb2 { flex: none; margin: 0 !important; width: 66px; height: 66px; border-radius: 50%; border: 2px solid #cfd5e6; background: #fff; color: #8a93ad; display: grid; place-items: center; cursor: pointer; transition: 0.2s; padding: 0; }
+      .tb2 svg { width: 32px; height: 32px; stroke-width: 1.8; }
+      .tb2.up:not(:disabled):hover { color: #19a37a; border-color: #19a37a; }
+      .tb2.dn:not(:disabled):hover { color: #e0456b; border-color: #e0456b; }
+      .tb2.up.on { color: #19a37a; border-color: #19a37a; background: #e6f7f1; }
+      .tb2.dn.on { color: #e0456b; border-color: #e0456b; background: #ffe9ee; }
+      .tb2.on svg { fill: currentColor; }
+      .tb2:disabled { cursor: default; }
+      .tb2:disabled:not(.on) { opacity: 0.35; }
+      .ld { display: flex; flex-direction: column; gap: 6px; align-items: center; margin: 40px auto; max-width: 260px; color: #889; font-size: 13px; text-align: center; }
+      .ld.sm { margin: 6px 0; max-width: none; align-items: stretch; text-align: left; }
+      .ldb { width: 100%; height: 8px; background: #e6e9f5; border-radius: 8px; overflow: hidden; }
+      .ldb i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #d6157f, #ff8a1f); transition: width 0.2s; }
+      .ld b { font-weight: 700; color: var(--m); }
+      .hero { position: relative; }
+      .hb { margin-left: auto; width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid #ffffff55; background: #ffffff1f; color: #fff; display: grid; place-items: center; cursor: pointer; padding: 0; }
+      .hb .ic { width: 22px; height: 22px; }
+      .hero.on .hb { background: #fff; color: #0b1a4a; }
+      #mn { position: absolute; right: 12px; top: calc(100% - 6px); background: #fff; border-radius: 14px; box-shadow: 0 10px 30px #0b1a4a40; padding: 6px; min-width: 170px; z-index: 8; }
+      #mn[hidden] { display: none; }
+      #mn button { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; padding: 11px 12px; border-radius: 10px; font-size: 14px; font-weight: 600; color: #0b1a4a; text-align: left; margin: 0; cursor: pointer; }
+      #mn button:hover { background: #f1f3fb; }
+      #mn button.out { color: #e0456b; }
+      .rh { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 17px; margin: 18px 0 6px; }
+      .rh .ic { width: 22px; height: 22px; color: #f2b705; }
+      .rsm { background: #eef0f8; border-radius: 10px; padding: 8px 10px; font-size: 12px; color: #667; margin: 4px 0 8px; }
+      .rc { position: relative; display: flex; align-items: center; gap: 12px; border-radius: 16px; padding: 10px 12px 10px 18px; margin: 10px 0; background: #fff; box-shadow: 0 4px 14px #0b1a4a14; }
+      .rc.r1 { background: linear-gradient(135deg, #fff6d6, #ffe08a); border: 2px solid #f2b705; padding-top: 14px; padding-bottom: 14px; }
+      .rc.r2 { background: linear-gradient(135deg, #f6f8fc, #dfe5f0); border: 2px solid #b9c2d6; }
+      .rc.r3 { background: linear-gradient(135deg, #fff1e8, #f3c9ac); border: 2px solid #d9895b; }
+      .rp { width: 52px; height: 52px; border-radius: 12px; overflow: hidden; background: #eef0f8; display: grid; place-items: center; flex: none; position: relative; }
+      .rc.r1 .rp { width: 74px; height: 74px; }
+      .rp img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .rp.av { background: linear-gradient(135deg, #d6157f, #ff8a1f); color: #fff; font-weight: 800; font-size: 22px; border-radius: 50%; }
+      .rn { position: absolute; left: -6px; top: -6px; width: 28px; height: 28px; border-radius: 50%; background: #0b1a4a; color: #fff; font-size: 14px; font-weight: 800; display: grid; place-items: center; }
+      .r1 .rn { background: #f2b705; color: #4a3000; }
+      .ri { flex: 1; min-width: 0; }
+      .ri em { display: block; font-style: normal; font-size: 11px; font-weight: 800; color: #b07d00; letter-spacing: 0.04em; text-transform: uppercase; }
+      .ri b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .ri small { color: #667; }
+      .rs { text-align: center; font-size: 12px; color: #667; }
+      .rs b { display: block; font-size: 20px; color: var(--m); }
+      .rs .ic { width: 16px; height: 16px; }
+      .jr { display: flex; flex-wrap: wrap; gap: 6px; }
+      .jr span { background: #fff; border: 1.5px solid #19a37a; color: #19a37a; border-radius: 20px; padding: 4px 10px; font-size: 13px; font-weight: 600; }
       /* ========== TETRIS (loading upload > 7 detik) ========== */
       #busy { overflow: auto; }
       #tbtn { margin-top: 14px; border: 0; border-radius: 12px; padding: 10px 16px; background: #fff; color: var(--n, #0b1a4a); font-weight: 700; font-size: 14px; cursor: pointer; }
@@ -791,7 +850,7 @@
           <circle cx="12" cy="13" r="3.5" />
         </symbol>
         <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5" /></symbol>
-      <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17h12l-1.5-2v-4a4.5 4.5 0 0 0-9 0v4zM10 20h4"/></symbol><symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol><symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol></defs>
+      <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17h12l-1.5-2v-4a4.5 4.5 0 0 0-9 0v4zM10 20h4"/></symbol><symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol><symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol><symbol id="i-like" viewBox="0 0 24 24"><path d="M7 11v9H4v-9zM7 11l4-7a2 2 0 0 1 2 2v4h5.5a1.5 1.5 0 0 1 1.5 1.7l-1 6a2 2 0 0 1-2 1.8H7"/></symbol><symbol id="i-dislike" viewBox="0 0 24 24"><path d="M7 13V4H4v9zM7 13l4 7a2 2 0 0 0 2-2v-4h5.5a1.5 1.5 0 0 0 1.5-1.7l-1-6a2 2 0 0 0-2-1.8H7"/></symbol><symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a2 2 0 0 0 3 4M16 6h3a2 2 0 0 1-3 4M12 13v4M9 20h6M10 17h4"/></symbol><symbol id="i-tl" viewBox="0 0 24 24"><path d="M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0"/></symbol><symbol id="i-kz" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.3M20 4v4h-4M20 12a8 8 0 0 1-14 5.3M4 20v-4h4"/></symbol><symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol><symbol id="i-out" viewBox="0 0 24 24"><path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5M15 8l4 4-4 4M19 12H9"/></symbol></defs>
     </svg>
 
     <!-- ========== HALAMAN LOGIN ========== -->
@@ -840,11 +899,17 @@
     <!-- ========== APLIKASI UTAMA ========== -->
     <div id="app" hidden>
       <div class="wrap">
-        <div class="hero">
+        <div class="hero" id="hero">
           <div class="av" id="hav"></div>
           <div>
             <small>Selamat datang</small>
             <h3 id="hi" style="margin: 0"></h3>
+          </div>
+          <button class="hb" id="hb" aria-label="Menu"><svg class="ic"><use href="#i-menu" /></svg></button>
+          <div id="mn" hidden>
+            <button data-a="me"><svg class="ic"><use href="#i-user" /></svg>Profil</button>
+            <button data-a="kz"><svg class="ic"><use href="#i-kz" /></svg>Kaizen</button>
+            <button data-a="out" class="out"><svg class="ic"><use href="#i-out" /></svg>Logout</button>
           </div>
         </div>
         <div id="pg"></div>
@@ -852,19 +917,7 @@
 
       <!-- ========== NAVIGASI BAWAH ========== -->
       <nav>
-        <button data-t="gen">
-          <span
-            ><svg class="ic"><use href="#i-add" /></svg></span
-          >Buat Konten</button
-        ><button data-t="mine">
-          <span
-            ><svg class="ic"><use href="#i-folder" /></svg></span
-          >Kontenku</button
-        ><button data-t="me">
-          <span
-            ><svg class="ic"><use href="#i-user" /></svg></span
-          >My Profile
-        </button>
+        <button data-t="tl"><span><svg class="ic"><use href="#i-tl" /></svg></span>Timeline</button><button data-t="gen"><span><svg class="ic"><use href="#i-add" /></svg></span>Buat</button><button data-t="mine"><span><svg class="ic"><use href="#i-folder" /></svg></span>Kontenku</button><button data-t="rank"><span><svg class="ic"><use href="#i-trophy" /></svg></span>Ranking</button>
       </nav>
     </div>
 
@@ -951,11 +1004,18 @@
           );
       let U = JSON.parse(localStorage.sess || "null"),
         K = [],
-        tab = "gen",
+        tab = "tl",
         F = { q: "", j: "", d: "" },
         bT,
         loaded = 0,
-        bfRun = 0;
+        bfRun = 0,
+        TL = [],
+        TLok = 0,
+        TLerr = "",
+        TF = { m: "all", q: "" },
+        RK = [],
+        RKi = 0;
+      const KZ = "https://marketingexata.github.io/kaizen/kaizen.html";
       // ========== 3. PENYIMPANAN DRAF (IndexedDB) ==========
 
       const idb = new Promise((r) => {
@@ -1288,6 +1348,7 @@
       // ========== 9. MUAT DATA & RENDER HALAMAN ==========
 
       async function load() {
+        tlLoad().catch(() => {});
         const r = await api("list");
         K = r.k.map((k) => ({ ...k, files: k.files ? JSON.parse(k.files) : [] })).reverse();
         CFG = Object.assign({ gambar: 1, carousel: 0, video: 1, link: 1 }, r.cfg || {});
@@ -1303,9 +1364,10 @@
         $("#hi").textContent = U.nama;
         av($("#hav"), U.nama, U.foto);
         document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.t == tab));
+        $("#hero").classList.toggle("on", tab == "me");
         P[tab]();
       }
-      const ORDER = ["gen", "mine", "me"];
+      const ORDER = ["me", "tl", "gen", "mine", "rank"];
       let swapping = 0;
       function go(t) {
         if (t === tab || swapping) return;
@@ -1313,6 +1375,7 @@
           dir = ORDER.indexOf(t) > ORDER.indexOf(tab) ? 1 : -1;
         tab = t;
         document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.t == tab));
+        $("#hero").classList.toggle("on", tab == "me");
         if (matchMedia("(prefers-reduced-motion: reduce)").matches) return render();
         swapping = 1;
         pg.style.setProperty("--dx", dir * 28 + "px");
@@ -1332,7 +1395,28 @@
           }, 650);
         }, 170);
       }
-      document.querySelectorAll("nav button").forEach((b) => (b.onclick = () => go(b.dataset.t)));
+      $("#hb").onclick = (e) => {
+        e.stopPropagation();
+        $("#mn").hidden = !$("#mn").hidden;
+      };
+      document.addEventListener("click", () => ($("#mn").hidden = true));
+      $("#mn").querySelectorAll("button").forEach(
+        (b) =>
+          (b.onclick = () => {
+            const a = b.dataset.a;
+            if (a == "me") go("me");
+            else if (a == "kz") window.open(KZ, "_blank", "noopener");
+            else {
+              localStorage.removeItem("sess");
+              U = null;
+              TL = [];
+              TLok = 0;
+              loaded = 0;
+              render();
+            }
+          }),
+      );
+      document.querySelectorAll("nav button").forEach((b) => (b.onclick = () => (b.dataset.t == "kaizen" ? window.open(KZ, "_blank", "noopener") : go(b.dataset.t))));
       const hasDraft = () => {
         const d = JSON.parse(localStorage.draft || "{}");
         return d.lk || d.nt || d.jd || d.n;
@@ -1382,22 +1466,172 @@
         const p = Math.round((Math.min(v, max) / max) * 100);
         return `<div class="pb"><div class="pl"><span>${lbl}</span><span>${Math.min(v, max)}/${max} · ${p}%</span></div><div class="pt"><i style="width:${p}%"></i></div></div>`;
       };
-      function remindBar() {
-        if (!loaded || !U) return "";
+      // Penanda "Memuat…" dengan persentase (naik pelan sampai 92%, hilang saat konten tampil)
+      let ldV = 0, ldT = 0;
+      function ld(label, sm) {
+        if (!document.querySelector(".ld")) ldV = 0;
+        if (!ldT)
+          ldT = setInterval(() => {
+            const els = document.querySelectorAll(".ld");
+            if (!els.length) { clearInterval(ldT); ldT = 0; return; }
+            ldV += (92 - ldV) * 0.08;
+            els.forEach((e) => { e.querySelector("i").style.width = ldV + "%"; e.querySelector("b").textContent = Math.round(ldV) + "%"; });
+          }, 150);
+        return `<div class="ld${sm ? " sm" : ""}"><span>${label}…</span><div class="ldb"><i></i></div><b>0%</b></div>`;
+      }
+      // Progres menilai (like/dislike) konten teman minggu ini. WAJIB untuk semua user.
+      function voteCalc() {
+        if (!TLok || !U) return null;
         const w = weekRange(),
+          by = {};
+        TL.forEach((k) => {
+          const d = String(k.tanggal).slice(0, 10);
+          if (d >= w.s && d <= w.e) (by[k.nama] = by[k.nama] || []).push(k);
+        });
+        const us = Object.keys(by);
+        return { by, us, pend: us.filter((n) => by[n].some((k) => !k.my)) };
+      }
+      function votePart(vc) {
+        if (!vc)
+          return TLerr
+            ? `<div class="vp"><b>Penilaian teman belum bisa dimuat.</b> ${esc(TLerr)}. Pastikan kode.gs sudah di-deploy versi terbaru.</div>`
+            : `<div class="vp">${ld("Memuat penilaian teman", 1)}</div>`;
+        if (!vc.us.length) return `<div class="vp">Belum ada konten teman minggu ini untuk dinilai.</div>`;
+        const bar = pbar("Penilaian teman (wajib)", vc.us.length - vc.pend.length, vc.us.length);
+        if (!vc.pend.length) return `<div class="vp">${bar}Semua konten teman minggu ini sudah kamu nilai.</div>`;
+        const nm = vc.pend.map((n) => { const c = vc.by[n].filter((k) => !k.my).length; return esc(n) + (c > 1 ? ` (${c} konten)` : ""); }).join(", ");
+        return `<div class="vp">${bar}<b>${vc.pend.length} pengguna belum kamu kasih like/dislike:</b> ${nm}<div class="ac"><button onclick="tlTodo()">Nilai sekarang</button></div></div>`;
+      }
+      function tlTodo() {
+        TF.m = "todo";
+        tab == "tl" ? render() : go("tl");
+      }
+      function remindBar() {
+        if (!U) return "";
+        if (!loaded) return `<div class="rm">${I("bell")}<div><b>Target mingguan</b>${ld("Memuat target mingguan", 1)}</div></div>`;
+        const vc = voteCalc(),
+          vp = votePart(vc),
+          vn = vc ? vc.pend.length : 0,
+          w = weekRange(),
           c = cntBy(w.s, w.e),
           n = need(c),
           ts = TY.filter((t) => +CFG[t] > 0);
-        if (!ts.length) return "";
+        if (!ts.length) return `<div class="rm${vn ? " hot" : ""}">${I("bell")}<div><b>Target mingguan</b>Tidak ada target upload minggu ini.${vp}</div></div>`;
         const totT = ts.reduce((a, t) => a + +CFG[t], 0),
           totD = ts.reduce((a, t) => a + Math.min(c[t], +CFG[t]), 0),
           bars = pbar("Total target", totD, totT) + ts.map((t) => pbar(cap(t), c[t], +CFG[t])).join(""),
           rng = `Minggu ${dmy(w.s)} – ${dmy(w.e)}`;
-        if (!txt(n))
-          return `<div class="rm ok">${I("check")}<div><b>Target mingguan tercapai</b>${rng}. Reset otomatis Senin depan.${bars}</div></div>`;
+        if (!txt(n) && !vn)
+          return `<div class="rm ok">${I("check")}<div><b>Target mingguan tercapai</b>${rng}. Reset otomatis Senin depan.${bars}${vp}</div></div>`;
         const sisa = w.left ? `Sisa ${w.left} hari.` : "Hari ini hari terakhir!",
-          nm = n.gambar || n.carousel || n.video;
-        return `<div class="rm${w.left <= 1 ? " hot" : ""}">${I("bell")}<div><b>Target mingguan belum tercapai</b>${rng}. Masih kurang ${txt(n)}. ${sisa} Progres direset tiap Senin.${bars}<div class="ac">${nm ? `<button onclick="openAdd('up')">Upload konten</button>` : ""}${n.link ? `<button onclick="openAdd('link')">Tambah link</button>` : ""}</div></div></div>`;
+          nm = n.gambar || n.carousel || n.video,
+          kurang = [txt(n), vn ? `menilai konten ${vn} pengguna` : ""].filter(Boolean).join(" dan ");
+        return `<div class="rm${w.left <= 1 ? " hot" : ""}">${I("bell")}<div><b>Target mingguan belum tercapai</b>${rng}. Masih kurang ${kurang}. ${sisa} Progres direset tiap Senin.${bars}${vp}<div class="ac">${nm ? `<button onclick="openAdd('up')">Upload konten</button>` : ""}${n.link ? `<button onclick="openAdd('link')">Tambah link</button>` : ""}</div></div></div>`;
+      }
+      // ========== TIMELINE: semua konten teman, urut like terbanyak ==========
+      async function tlLoad() {
+        try {
+          const r = await api("tl");
+          TL = r.k.map((k) => ({ ...k, files: k.files ? JSON.parse(k.files) : [] }));
+          TLok = 1;
+          TLerr = "";
+          tlRender();
+        } catch (e) {
+          TLerr = e.message || "gagal memuat";
+          tlRender();
+          throw e;
+        }
+      }
+      function tlRender() {
+        if (tab != "tl" || !$("#tlg")) return;
+        $("#tlbars").innerHTML = remindBar() + debtBar();
+        if (!TLok) return ($("#tlg").innerHTML = ld("Memuat timeline"));
+        const w = weekRange(),
+          q = TF.q.toLowerCase(),
+          r = TL.filter((k) => {
+            const d = String(k.tanggal).slice(0, 10);
+            return (TF.m != "week" || (d >= w.s && d <= w.e)) && (TF.m != "todo" || !k.my) && (!q || [k.judul, k.nama, k.catatan].join(" ").toLowerCase().includes(q));
+          }).sort((a, b) => b.lk - a.lk || String(b.tanggal).localeCompare(String(a.tanggal)));
+        $("#tlg").innerHTML = r.length
+          ? `<div class="grid">${r.map((k) => `<div class="cd" onclick="tlView('${k.id}')"><div class="th ${k.tipe == "link" ? "lnk" : ""}">${k.tipe == "link" ? `${I("link")}<small>${esc(host(k.url))}</small>${lt(k)}` : `<img loading="lazy" src="${th(k.files[0] && k.files[0].id)}400" onerror="this.remove()">${I("image")}`}<span class="tg">${jenis(k)}</span><span class="sc">${I("like")} ${k.lk}</span></div><p>${esc(k.judul)}</p><small>${esc(k.nama)} · <span class="vs ${k.my ? "ok" : ""}">${k.my ? "sudah kunilai" : "belum kunilai"}</span></small></div>`).join("")}</div>`
+          : '<p style="text-align:center;color:#889;margin-top:40px">Belum ada konten di sini</p>';
+      }
+      setInterval(() => {
+        if (U && tab == "tl" && !document.hidden && !document.querySelector(".ov.on")) tlLoad().catch(() => {});
+      }, 25000); // refresh otomatis di latar belakang
+      function tlView(id) {
+        const k = TL.find((x) => x.id == id);
+        if (!k) return;
+        const body =
+          k.tipe == "link"
+            ? `${lt(k, 1)}<a href="${esc(k.url)}" target="_blank" rel="noopener">${esc(k.url)}</a><button class="pri" style="margin:12px 0" onclick="window.open('${esc(k.url)}','_blank')">Buka link</button>`
+            : k.files.map((f) => /^video/.test(f.m) ? `<iframe src="https://drive.google.com/file/d/${f.id}/preview" allowfullscreen></iframe>` : `<a href="https://drive.google.com/file/d/${f.id}/view" target="_blank"><img src="${th(f.id)}1200"></a>`).join("");
+        const o = modal(`<small style="color:#889">${esc(k.nama)} · ${esc(k.tanggal)} · ${jenis(k)}</small><div class="vw" style="margin-top:10px">${body}</div>${k.catatan ? `<p>${I("text")} ${esc(k.catatan)}</p>` : ""}<div id="vt"></div>`, 0, esc(k.judul)),
+          vt = o.querySelector("#vt");
+        const thumbs = (my, lock) =>
+          `<div class="vb"><button class="tb2 up ${my == "like" ? "on" : ""}" data-v="like" aria-label="Like" ${lock ? "disabled" : ""}>${I("like")}</button><button class="tb2 dn ${my == "dislike" ? "on" : ""}" data-v="dislike" aria-label="Dislike" ${lock ? "disabled" : ""}>${I("dislike")}</button></div>`;
+        if (k.my) return (vt.innerHTML = thumbs(k.my, 1) + `<p style="text-align:center;font-size:13px;color:#667;margin-top:8px">Penilaianmu tercatat</p>`);
+        api("voteOpen", { id }).catch(() => {});
+        const WAIT = 15;
+        vt.innerHTML = `<div class="wt">Sebelum kasih like/dislike perhatiin dulu kontennya baik baik, kita kasih waktu ${WAIT} detik<div class="wb"><i></i></div><small id="wc">${WAIT} detik lagi…</small></div>`;
+        const bar = vt.querySelector(".wb i");
+        requestAnimationFrame(() => requestAnimationFrame(() => (bar.style.width = "100%")));
+        let left = WAIT;
+        const iv = setInterval(() => {
+          if (!o.isConnected) return clearInterval(iv);
+          left--;
+          if (left > 0) return (vt.querySelector("#wc").textContent = left + " detik lagi…");
+          clearInterval(iv);
+          vt.innerHTML = thumbs("", 0);
+          vt.querySelectorAll("button").forEach(
+            (b) =>
+              (b.onclick = async () => {
+                const bs = [...vt.querySelectorAll("button")];
+                bs.forEach((x) => (x.disabled = true));
+                b.classList.add("on");
+                busy(1, "Menyimpan penilaian…");
+                try {
+                  await api("vote", { id, v: b.dataset.v });
+                  const c = TL.find((x) => x.id == id);
+                  if (c) { c.my = b.dataset.v; if (b.dataset.v == "like") c.lk++; }
+                  vt.insertAdjacentHTML("beforeend", `<p style="text-align:center;font-size:13px;color:#667;margin-top:8px">Penilaianmu tercatat</p>`);
+                  tlRender();
+                  tlLoad().catch(() => {});
+                } catch (e) {
+                  toast(e.message);
+                  b.classList.remove("on");
+                  bs.forEach((x) => (x.disabled = false));
+                } finally {
+                  busy(0);
+                }
+              }),
+          );
+        }, 1000);
+      }
+      // ========== RANKING: Content of the Week & Creator Choice ==========
+      async function rankLoad() {
+        try {
+          RK = (await api("rank")).w;
+          RKi = Math.min(RKi, Math.max(0, RK.length - 1));
+          rankRender();
+        } catch (e) {
+          if ($("#rk")) $("#rk").innerHTML = `<p style="text-align:center;color:#889;margin-top:40px">${esc(e.message)}</p>`;
+        }
+      }
+      function rankRender() {
+        const el = $("#rk");
+        if (!el || tab != "rank") return;
+        if (!RK.length) return (el.innerHTML = '<p style="text-align:center;color:#889;margin-top:40px">Belum ada data ranking</p>');
+        const w = RK[RKi],
+          pic = (x) => x.tipe == "link" ? (thumbOf(x) ? `<img referrerpolicy="no-referrer" src="${esc(thumbOf(x))}" onerror="this.remove()">` : I("link")) : x.f ? `<img src="${th(x.f)}300" onerror="this.remove()">` : I("image"),
+          cow = w.cow.map((x, i) => `<div class="rc r${i + 1}"><span class="rn">${i + 1}</span><div class="rp">${pic(x)}</div><div class="ri">${i == 0 ? "<em>Content of the Week</em>" : ""}<b>${esc(x.judul)}</b><small>oleh ${esc(x.nama)}</small></div><div class="rs">${I("like")}<b>${x.lk}</b></div></div>`).join(""),
+          cc = w.cc.map((x, i) => `<div class="rc r${i + 1}"><span class="rn">${i + 1}</span><div class="rp av">${esc(x.nama[0].toUpperCase())}</div><div class="ri">${i == 0 ? "<em>Creator Choice</em>" : ""}<b>${esc(x.nama)}</b><small>${x.n} konten dinilai</small></div><div class="rs"><b>${x.skor}</b>skor</div></div>`).join("");
+        el.innerHTML =
+          `<div class="chips">${RK.map((x, i) => `<button data-i="${i}" class="${i == RKi ? "on" : ""}">${x.sementara ? "Minggu ini" : dmy(x.w)}</button>`).join("")}</div>` +
+          `<p class="rsm">${w.sementara ? "Sementara: minggu masih berjalan, hasil bisa berubah. " : ""}Minggu ${dmy(w.w)} – ${dmy(addD(w.w, 6))} · ${w.total} konten</p>` +
+          `<div class="rh">${I("trophy")} Content of the Week</div>${cow || '<p class="rsm">Belum ada konten yang mendapat like.</p>'}` +
+          `<div class="rh">${I("star")} Creator Choice</div>${cc || '<p class="rsm">Belum ada kreator yang memenuhi syarat.</p>'}`;
+        el.querySelectorAll(".chips button").forEach((b) => (b.onclick = () => { RKi = +b.dataset.i; rankRender(); }));
       }
       // ========== HUTANG KONTEN (kekurangan target minggu-minggu sebelumnya) ==========
       // Aturan: minggu pertama user (sejak konten/kunjungan pertama) bebas; hitung maksimal DEBT_WEEKS minggu terakhir;
@@ -1460,6 +1694,27 @@
       // ========== 10. ISI HALAMAN (BUAT KONTEN, KONTENKU, PROFIL) ==========
 
       const P = {
+        tl() {
+          $("#pg").innerHTML =
+            `${infoBar()}<div id="tlbars"></div><h2>Timeline</h2><div class="bar"><input class="q" id="tq" placeholder="Cari judul, nama, catatan…" value="${esc(TF.q)}"></div><div class="chips">${[["all", "Semua"], ["week", "Minggu ini"], ["todo", "Belum kunilai"]].map(([m, l]) => `<button data-m="${m}" class="${TF.m == m ? "on" : ""}">${l}</button>`).join("")}</div><div id="tlg"></div>`;
+          $("#tq").oninput = (e) => {
+            TF.q = e.target.value;
+            tlRender();
+          };
+          document.querySelectorAll(".chips button").forEach(
+            (b) =>
+              (b.onclick = () => {
+                TF.m = b.dataset.m;
+                document.querySelectorAll(".chips button").forEach((x) => x.classList.toggle("on", x == b));
+                tlRender();
+              }),
+          );
+          tlRender();
+        },
+        rank() {
+          $("#pg").innerHTML = `${infoBar()}<h2>Ranking</h2><div id="rk">${ld("Memuat ranking")}</div>`;
+          rankLoad();
+        },
         gen() {
           $("#pg").innerHTML =
             `${infoBar()}${remindBar()}${debtBar()}<h2>Buat Konten</h2><div class="stat"><div><b>${K.length}</b>Total konten</div><div><b>${K.filter((k) => k.nilai).length}</b>Sudah dinilai</div></div>${draftBar()}<div class="gens" style="margin-top:12px">${GEN.map((g, i) => `<button class="gc" onclick="openGen('${g[3]}')"><i>${I(g[0])}</i><span><b>${g[1]}</b><small>${g[2]}</small></span></button>`).join("")}</div>`;
@@ -1592,7 +1847,7 @@
                 )
                 .join("");
         const o = modal(
-          `<small style="color:#889">${esc(k.tanggal)} · ${jenis(k)}</small><div class="vw" style="margin-top:10px">${body}</div>${k.catatan ? `<p>${I("text")} ${esc(k.catatan)}</p>` : ""}${k.nilai || k.komentar ? `<div class="nl"><b>Penilaian admin: ${I("star")} ${esc(k.nilai || "-")}</b><p style="white-space:pre-line">${esc(k.komentar)}</p></div>` : ""}<button class="sec dng" style="width:100%;margin-top:10px" id="dl">${I("trash")} Hapus konten</button>`,
+          `<small style="color:#889">${esc(k.tanggal)} · ${jenis(k)} · ${I("like")} ${k.lk || 0} like</small><div class="vw" style="margin-top:10px">${body}</div>${k.catatan ? `<p>${I("text")} ${esc(k.catatan)}</p>` : ""}${k.nilai || k.komentar ? `<div class="nl"><b>Penilaian admin: ${I("star")} ${esc(k.nilai || "-")}</b><p style="white-space:pre-line">${esc(k.komentar)}</p></div>` : ""}<button class="sec dng" style="width:100%;margin-top:10px" id="dl">${I("trash")} Hapus konten</button>`,
           0,
           esc(k.judul),
         );
@@ -1750,7 +2005,10 @@
           }
         };
       }
-      if (U) load().catch(() => render());
+      if (U) {
+        busy(1, "Memuat data…");
+        load().catch(() => render()).finally(() => busy(0));
+      }
       else render();
     </script>
   </body>
