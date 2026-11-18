@@ -397,6 +397,46 @@
       .if p { margin: 6px 0; white-space: pre-line; }
       .if .ac { display: flex; gap: 6px; }
       .if .ac button { border: 1.5px solid #dde1f0; background: #fff; border-radius: 10px; padding: 5px 10px; font-size: 12px; cursor: pointer; }
+      /* ========== TAMBAHAN: RANKING & VOTING ========== */
+      .ld { display: flex; flex-direction: column; gap: 6px; align-items: center; margin: 40px auto; max-width: 260px; color: #889; font-size: 13px; text-align: center; }
+      .ld.sm { margin: 6px 0; max-width: none; align-items: stretch; text-align: left; }
+      .ldb { width: 100%; height: 8px; background: #e6e9f5; border-radius: 8px; overflow: hidden; }
+      .ldb i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #d6157f, #ff8a1f); transition: width 0.2s; }
+      .ld b { font-weight: 700; color: var(--m); }
+      .nav button { font-size: 13px; padding: 9px 2px; }
+      .chips { display: flex; gap: 6px; margin: 8px 0 12px; overflow-x: auto; }
+      .chips button, .wk2 button { border: 1.5px solid #dde1f0; background: #fff; border-radius: 20px; padding: 6px 12px; font-size: 13px; white-space: nowrap; color: #556; cursor: pointer; }
+      .chips button.on { background: var(--g); border-color: transparent; color: #fff; font-weight: 700; }
+      .wk2 { display: flex; gap: 6px; align-items: center; margin: 10px 0; }
+      .wk2 input { flex: 1; }
+      .rh { font-weight: 800; font-size: 17px; margin: 18px 0 6px; }
+      .rsm { background: #eef0f8; border-radius: 10px; padding: 8px 10px; font-size: 12px; color: #667; margin: 4px 0 8px; }
+      .rc { position: relative; display: flex; align-items: center; gap: 12px; border-radius: 16px; padding: 10px 12px 10px 18px; margin: 10px 0; background: #fff; box-shadow: 0 4px 14px #0b1a4a14; }
+      .rc.r1 { background: linear-gradient(135deg, #fff6d6, #ffe08a); border: 2px solid #f2b705; }
+      .rc.r2 { background: linear-gradient(135deg, #f6f8fc, #dfe5f0); border: 2px solid #b9c2d6; }
+      .rc.r3 { background: linear-gradient(135deg, #fff1e8, #f3c9ac); border: 2px solid #d9895b; }
+      .rp { width: 52px; height: 52px; border-radius: 12px; overflow: hidden; background: #eef0f8; flex: none; position: relative; display: grid; place-items: center; }
+      .rp img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .rp.av { background: var(--g); color: #fff; font-weight: 800; font-size: 22px; border-radius: 50%; }
+      .rn { position: absolute; left: -6px; top: -6px; width: 28px; height: 28px; border-radius: 50%; background: #0b1a4a; color: #fff; font-size: 14px; font-weight: 800; display: grid; place-items: center; }
+      .r1 .rn { background: #f2b705; color: #4a3000; }
+      .ri { flex: 1; min-width: 0; font-size: 13px; }
+      .ri em { display: block; font-style: normal; font-size: 11px; font-weight: 800; color: #b07d00; text-transform: uppercase; }
+      .ri b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+      .ri small { color: #667; display: block; }
+      .rs { text-align: center; font-size: 12px; color: #667; }
+      .rs b { display: block; font-size: 20px; color: var(--m); }
+      .jr { display: flex; flex-wrap: wrap; gap: 6px; }
+      .jr span { background: #fff; border: 1.5px solid #19a37a; color: #19a37a; border-radius: 20px; padding: 4px 10px; font-size: 13px; font-weight: 600; }
+      .sx { font-weight: 700; }
+      .sx.ok { color: #19a37a; }
+      .sx.mid { color: #d98a00; }
+      .sx.no { color: #e0456b; }
+      .vl { color: #19a37a; font-weight: 700; }
+      .vd { color: #e0456b; font-weight: 700; }
+      table.rk td.l { text-align: left; }
+      table.rk details summary { cursor: pointer; font-weight: 600; }
+      table.rk details div { font-size: 12px; color: #667; font-weight: 400; margin-top: 4px; }
     </style>
   </head>
   <body>
@@ -495,7 +535,7 @@
           <div><b id="s3">0</b>User aktif</div>
         </div>
         <div class="nav">
-          <button data-t="konten">Konten</button><button data-t="rekap">Rekap</button><button data-t="atur">Pengaturan</button>
+          <button data-t="konten">Konten</button><button data-t="rekap">Rekap</button><button data-t="rank">Ranking</button><button data-t="vote">Voting</button><button data-t="atur">Atur</button>
         </div>
         <div id="tk">
         <div class="bar">
@@ -515,6 +555,8 @@
           <p class="ht">Periode berdasarkan tanggal upload konten (kosongkan = semua). Hanya konten yang sudah dinilai minimal 1 admin. Tiap kolom = jumlah nilai rata-rata semua konten user. Warna kuning = nilai tertinggi.</p>
           <div id="rkt"></div>
         </div>
+        <div id="tn" hidden></div>
+        <div id="tv" hidden></div>
         <div id="ta" hidden></div>
       </div>
     </div>
@@ -694,7 +736,7 @@
       $("#rf").onclick = () => task("Memuat data…", load);
       // ========== 8. MUAT DATA & RENDER ==========
 
-      let NA = 3, CFG = {}, INFO = [], USERS = [], TAB = "konten";
+      let NA = 3, CFG = {}, INFO = [], USERS = [], VT = [], RKA = [], RAi = 0, VW = "", VF = "", VALL = 0, TAB = "konten";
       const FMT = { gambar: 5, carousel: 7, video: 10, link: 10 },
         FL = { gambar: "Gambar single", carousel: "Carousel", video: "Video", link: "Link" },
         MX = { ide: 35, desain: 30, lengkap: 25 };
@@ -711,6 +753,7 @@
         CFG = r.cfg || {};
         INFO = r.info || [];
         USERS = r.us || [];
+        VT = r.vt || [];
         render();
       }
       function render() {
@@ -730,9 +773,13 @@
         $("#tk").hidden = TAB != "konten";
         $("#tr").hidden = TAB != "rekap";
         $("#ta").hidden = TAB != "atur";
+        $("#tn").hidden = TAB != "rank";
+        $("#tv").hidden = TAB != "vote";
         list();
         if (TAB == "rekap") rekap();
         if (TAB == "atur") atur();
+        if (TAB == "vote") voteA();
+        if (TAB == "rank") rankA();
       }
       ["fq", "fu", "fj", "fd"].forEach((i) => ($("#" + i).oninput = list));
       ["rd1", "rd2"].forEach((i) => ($("#" + i).oninput = rekap));
@@ -783,11 +830,14 @@
                 .join("");
         const inp = (key, lbl) =>
           `<label class="sl">${lbl}<small>maks ${MX[key]}</small><input id="s_${key}" type="number" inputmode="decimal" min="0" max="${MX[key]}" step="any" value="${esc(m[key] ?? "")}"></label>`;
-        const fm0 = m.format || jenis(k);
+        const fm0 = m.format || jenis(k),
+          vs = VT.filter((v) => v.kid == id),
+          nm = (x) => x.map((v) => esc(v.voter)).join(", ") || "-",
+          vtxt = `<p class="ht">Suara user: <span class="vl">${vs.filter((v) => v.nilai == "like").length} like</span> (${nm(vs.filter((v) => v.nilai == "like"))}) · <span class="vd">${vs.filter((v) => v.nilai == "dislike").length} dislike</span> (${nm(vs.filter((v) => v.nilai == "dislike"))})</p>`;
         const o = modal(
           `<h3 style="padding-right:80px">${esc(k.judul)}</h3><small style="color:#889">${I("user")} ${esc(k.nama)} · ${esc(k.tanggal)} · ${jenis(k)}</small><div class="vw" style="margin:10px 0">${body}</div>${k.catatan ? `<p style="margin-bottom:12px">${I("text")} ${esc(k.catatan)}</p>` : ""}` +
             (k.sk.length ? `<p class="tt">Rata-rata saat ini: <b>${fin(k)}</b> <small>(${k.sk.length}/${NA} admin sudah menilai)</small></p>` : "") +
-            `<h3>Penilaianmu</h3>${inp("ide", "Ide")}${inp("desain", "Desain")}${inp("lengkap", "Kelengkapan &amp; keselarasan")}<label class="sl">Format konten<select id="s_fmt">${Object.keys(FMT).map((f) => `<option value="${f}" ${f == fm0 ? "selected" : ""}>${FL[f]} (${FMT[f]} poin)</option>`).join("")}</select></label><p class="tt">Totalmu: <b id="s_tot">0</b> <small id="s_max"></small></p><textarea id="km" placeholder="Komentar untuk user…">${esc(m.kom)}</textarea><button class="pri" id="sv">Simpan penilaian</button>` +
+            vtxt + `<h3>Penilaianmu</h3>${inp("ide", "Ide")}${inp("desain", "Desain")}${inp("lengkap", "Kelengkapan &amp; keselarasan")}<label class="sl">Format konten<select id="s_fmt">${Object.keys(FMT).map((f) => `<option value="${f}" ${f == fm0 ? "selected" : ""}>${FL[f]} (${FMT[f]} poin)</option>`).join("")}</select></label><p class="tt">Totalmu: <b id="s_tot">0</b> <small id="s_max"></small></p><textarea id="km" placeholder="Komentar untuk user…">${esc(m.kom)}</textarea><button class="pri" id="sv">Simpan penilaian</button>` +
             (oth.length
               ? `<h3 style="margin-top:16px">Penilaian admin lain</h3>${oth.map((s) => `<div class="ot"><b>${esc(s.admin)}</b><span>${tot(s)}</span><small>Ide ${esc(s.ide)} · Desain ${esc(s.desain)} · Kelengkapan ${esc(s.lengkap)} · ${esc(FL[s.format] || s.format)} ${esc(s.fpoin)}</small>${s.kom ? `<p>${esc(s.kom)}</p>` : ""}</div>`).join("")}`
               : ""),
@@ -875,12 +925,82 @@
           await load();
         });
       }
-      if (A)
-        load().catch(() => {
-          A = null;
-          render();
-        });
-      else render();
+      // Penanda "Memuat…" dengan persentase (naik pelan sampai 92%, hilang saat konten tampil)
+      let ldV = 0, ldT = 0;
+      function ld(label, sm) {
+        if (!document.querySelector(".ld")) ldV = 0;
+        if (!ldT)
+          ldT = setInterval(() => {
+            const els = document.querySelectorAll(".ld");
+            if (!els.length) { clearInterval(ldT); ldT = 0; return; }
+            ldV += (92 - ldV) * 0.08;
+            els.forEach((e) => { e.querySelector("i").style.width = ldV + "%"; e.querySelector("b").textContent = Math.round(ldV) + "%"; });
+          }, 150);
+        return `<div class="ld${sm ? " sm" : ""}"><span>${label}…</span><div class="ldb"><i></i></div><b>0%</b></div>`;
+      }
+      // ========== 13. VOTING USER: SIAPA SUDAH / BELUM MENILAI ==========
+
+      const tdy = () => new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10),
+        addD = (s, n) => { const d = new Date(s + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); },
+        mon = (s) => { const d = new Date(String(s).slice(0, 10) + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7)); return d.toISOString().slice(0, 10); },
+        dm = (s) => { const [y, m, d] = s.split("-"); return d + "/" + m + "/" + y; };
+      function voteA() {
+        if (!VW) VW = mon(tdy());
+        const w = VW,
+          ks = K.filter((k) => mon(k.tanggal) == w),
+          vb = {};
+        VT.forEach((v) => (vb[String(v.voter).trim() + "|" + v.kid] = 1));
+        const us = [...new Set([...USERS, ...K.map((k) => k.nama)])].filter(Boolean).sort(),
+          R = us.map((u) => {
+            const req = ks.filter((k) => String(k.nama).trim() != String(u).trim()),
+              todo = req.filter((k) => !vb[u + "|" + k.id]);
+            return { u, req: req.length, done: req.length - todo.length, todo };
+          }),
+          st = (r) => (!r.req ? ["—", ""] : !r.todo.length ? ["Lengkap", "ok"] : r.done ? ["Sebagian", "mid"] : ["Belum", "no"]),
+          lengkap = R.filter((r) => r.req && !r.todo.length).length,
+          wajib = R.filter((r) => r.req).length,
+          lg = VT.filter((v) => (VALL || v.minggu == w) && (!VF || v.voter == VF)).sort((a, b) => String(b.tanggal).localeCompare(String(a.tanggal)));
+        $("#tv").innerHTML =
+          `<div class="wk2"><button id="vpv">‹</button><input type="date" id="vwd" value="${w}"><button id="vnx">›</button></div><p class="ht">Minggu ${dm(w)} – ${dm(addD(w, 6))} · ${ks.length} konten diupload · ${lengkap} dari ${wajib} user sudah menilai semua konten teman</p>` +
+          `<div class="tw"><table class="rk"><thead><tr><th>Nama</th><th>Wajib</th><th>Sudah</th><th>Belum</th><th>Status</th></tr></thead><tbody>${R.map((r) => `<tr><td class="nm l">${r.todo.length ? `<details><summary>${esc(r.u)}</summary><div>Belum dinilai: ${r.todo.map((k) => esc(k.nama) + " – " + esc(k.judul)).join("; ")}</div></details>` : esc(r.u)}</td><td>${r.req}</td><td>${r.done}</td><td>${r.todo.length}</td><td class="sx ${st(r)[1]}">${st(r)[0]}</td></tr>`).join("")}</tbody></table></div>` +
+          `<h3 style="margin-top:18px">Riwayat penilaian</h3><div class="bar"><select id="vfu"><option value="">Semua user</option>${us.map((u) => `<option ${u == VF ? "selected" : ""}>${esc(u)}</option>`).join("")}</select><label style="font-size:13px"><input type="checkbox" id="vall" ${VALL ? "checked" : ""}> Semua minggu</label></div>` +
+          (lg.length ? `<div class="tw"><table class="rk"><thead><tr><th>Waktu</th><th>Penilai</th><th>Pemilik</th><th>Konten</th><th>Nilai</th></tr></thead><tbody>${lg.map((v) => `<tr><td>${esc(v.tanggal)}</td><td class="l">${esc(v.voter)}</td><td class="l">${esc(v.pemilik)}</td><td class="l">${esc(v.judul)}</td><td class="${v.nilai == "like" ? "vl" : "vd"}">${v.nilai == "like" ? "Like" : "Dislike"}</td></tr>`).join("")}</tbody></table></div>` : '<p class="ht">Belum ada penilaian.</p>');
+        $("#vpv").onclick = () => { VW = addD(w, -7); voteA(); };
+        $("#vnx").onclick = () => { VW = addD(w, 7); voteA(); };
+        $("#vwd").onchange = (e) => { if (e.target.value) { VW = mon(e.target.value); voteA(); } };
+        $("#vfu").onchange = (e) => { VF = e.target.value; voteA(); };
+        $("#vall").onchange = (e) => { VALL = e.target.checked ? 1 : 0; voteA(); };
+      }
+      // ========== 14. RANKING (dengan rincian skor untuk admin) ==========
+
+      async function rankA() {
+        if (!RKA.length) $("#tn").innerHTML = ld("Memuat ranking");
+        try {
+          RKA = (await api("aRank")).w;
+        } catch (e) {
+          return ($("#tn").innerHTML = `<p class="ht">${esc(e.message)}</p>`);
+        }
+        RAi = Math.min(RAi, Math.max(0, RKA.length - 1));
+        if (!RKA.length) return ($("#tn").innerHTML = '<p class="ht" style="text-align:center;margin-top:30px">Belum ada data</p>');
+        const w = RKA[RAi],
+          pic = (x) => x.tipe == "link" ? (x.thumb && x.thumb != "-" ? `<img referrerpolicy="no-referrer" src="${esc(x.thumb)}" onerror="this.remove()">` : "") : x.f ? `<img src="${th(x.f)}300" onerror="this.remove()">` : "",
+          cow = w.cow.map((x, i) => `<div class="rc r${i + 1}"><span class="rn">${i + 1}</span><div class="rp">${pic(x)}</div><div class="ri">${i == 0 ? "<em>Content of the Week</em>" : ""}<b>${esc(x.judul)}</b><small>oleh ${esc(x.nama)} · ${x.lk} like · ${x.dl} dislike · skor admin ${x.adm ?? "-"}</small></div><div class="rs"><b>${x.lk}</b>like</div></div>`).join(""),
+          cc = w.cc.map((x, i) => `<div class="rc r${i + 1}"><span class="rn">${i + 1}</span><div class="rp av">${esc(x.nama[0].toUpperCase())}</div><div class="ri">${i == 0 ? "<em>Creator Choice</em>" : ""}<b>${esc(x.nama)}</b><small>${x.n} konten dinilai · admin ${x.adm} (×60%) · like ${x.lkn} (×40%)</small></div><div class="rs"><b>${x.skor}</b>skor</div></div>`).join("");
+        $("#tn").innerHTML =
+          `<div class="chips">${RKA.map((x, i) => `<button data-i="${i}" class="${i == RAi ? "on" : ""}">${x.sementara ? "Minggu ini" : dm(x.w)}</button>`).join("")}</div><p class="rsm">${w.sementara ? "Sementara: minggu masih berjalan. " : ""}Minggu ${dm(w.w)} – ${dm(addD(w.w, 6))} · ${w.total} konten</p>` +
+          `<div class="rh">Content of the Week</div>${cow || '<p class="rsm">Belum ada konten yang mendapat like.</p>'}` +
+          `<div class="rh">Creator Choice</div><p class="rsm">Skor = 60% rata-rata skor admin + 40% like (dinormalisasi ke like tertinggi minggu itu). Syarat: target mingguan terpenuhi, sudah dinilai admin, dan sudah menilai semua konten teman.</p>${cc || '<p class="rsm">Belum ada kreator yang memenuhi syarat.</p>'}`;
+        $("#tn").querySelectorAll(".chips button").forEach((b) => (b.onclick = () => { RAi = +b.dataset.i; rankA(); }));
+      }
+      if (A) {
+        busy(1, "Memuat data…");
+        load()
+          .catch(() => {
+            A = null;
+            render();
+          })
+          .finally(() => busy(0));
+      } else render();
     </script>
   </body>
 </html>
